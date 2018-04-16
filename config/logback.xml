@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+	<property scope="system" name="APP_NAME" value="mx_integral" />
+	<property scope="system" name="APP_ENV" value="development" />
+	<!--<property scope="system" name="LOG_DIR" value="/home/ewhine/deploy/mx_integral/logs" />-->
+	<property scope="system" name="LOG_DIR" value="./logs" />
+
+	<!-- 日志写入文件系统 -->
+	<appender name="ROLLING"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 默认输出INFO级别 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>debug</level>
+		</filter>
+		<file>${LOG_DIR}/${APP_NAME}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志每天进行rotate -->
+			<fileNamePattern>${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>14</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- 每个日志文件大小不超过2GB -->
+				<maxFileSize>2000MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+		<!-- 日志输出格式 -->
+		<encoder>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss.SSS}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p] %c{3}.%M[%L]-%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- console输出 -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<encoder>
+ 			<pattern>%d{yyyy/MM/dd HH:mm:ss.SSS}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p] %c{3}.%M[%L]-%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="ROLLING" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+
+	<!-- 对于一些特定的包进行默认日志级别设定 -->
+	<logger name="org.apache.*" level="WARN" />
+
+</configuration>
