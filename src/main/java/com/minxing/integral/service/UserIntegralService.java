@@ -29,16 +29,10 @@ public interface UserIntegralService {
 
     /**
      * 增加积分
-     * @param params
+     * @param
      * @return
      */
-    Integer addIntegralByUserId(Map params);
-    /**
-     * 根据事件查询对应时间的积分
-     * @param type
-     * @return integral
-     */
-    Long selectIntegral(String type);
+    Boolean addIntegralByUserId(Integer userId, String actionType, String extParams);
 
     /**
      * 修改积分规则

@@ -1,5 +1,7 @@
 package com.minxing.integral.dao;
 
+import com.minxing.integral.common.bean.Integral;
+import com.minxing.integral.common.bean.IntegralRecord;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import org.apache.ibatis.annotations.*;
@@ -65,19 +67,18 @@ public interface UserIntegralMapper {
 
     /**
      * 通过usrid增加积分
-     * @param userIntegral
      * @return
      */
     @Update("UPDATE user_infos SET integral=integral+#{integral} WHERE user_id=#{userId}")
-    Integer addIntegralByUserId(UserInfos userIntegral);
+    Integer addIntegralByUserId(@Param("integral") Integer userId, @Param("integral") Integer integral);
 
     /**
      * 根据事件查询对应时间的积分
      * @param type
      * @return integral
      */
-    @Select("SELECT  integral FROM integral where type=#{type}")
-    Long selectIntegral(String type);
+    @Select("SELECT integral FROM integral where type=#{type}")
+    Integral selectIntegral(String type);
 
     /**
      * 修改积分规则
@@ -87,5 +88,14 @@ public interface UserIntegralMapper {
      */
     @Update("UPDATE integral SET integral=6 WHERE type=#{type}")
     Integer updateIntegralByType(String type);
+
+
+    /**
+     * 新增用户事件
+     * @param integralRecord
+     * @return
+     */
+    @Insert("INSERT INTO `integral_record` (`id`, `integral_id`, `user_id`, `create_date`) VALUES (null, #{integralId}, #{userId}, #{createDate};")
+    Integer insertIntegralRecord(IntegralRecord integralRecord);
 }
 

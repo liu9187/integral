@@ -1,7 +1,10 @@
 package com.minxing.integral.service.impl;
 
+import com.minxing.integral.common.bean.Integral;
+import com.minxing.integral.common.bean.IntegralRecord;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
+import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.UserIntegralService;
 import org.slf4j.Logger;
@@ -76,24 +79,47 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     /**
      * 增加积分
-     * @param params
+     * @param
      * @return
      */
     @Override
     @Transactional
-    public Integer addIntegralByUserId(Map params) {
-        UserInfos userIntegral=new UserInfos();
-        return userIntegralMapper.addIntegralByUserId(userIntegral);
+    public Boolean addIntegralByUserId(Integer userId, String actionType, String extParams) {
+        try {
+            //根据事件的类型查出对应积分数据
+            Integral integral = userIntegralMapper.selectIntegral(actionType);
+            if(null == integral){
+                logger.error("integral number error");
+                return false;
+            }
+            //增加积分
+            Integer res = userIntegralMapper.addIntegralByUserId(userId, integral.getIntegral().intValue());
+            if(1 != res){
+                logger.error("add integral error");
+                return false;
+            }
+            //记录此次事件
+            IntegralRecord integralRecord = new IntegralRecord();
+            integralRecord.setIntegralId(integral.getId());
+            integralRecord.setUserId(userId.toString());
+            integralRecord.setCreateDate(new Date().getTime());
+
+            Integer rest = userIntegralMapper.insertIntegralRecord(integralRecord);
+            if(1 != rest){
+                logger.error("add integral_record error");
+                return false;
+            }
+        }catch (Exception e){
+            logger.error("event operation error");
+            return false;
+        }
+        return true;
     }
-    /**
-     * 根据事件查询对应时间的积分
-     * @param type
-     * @return integral
-     */
-    @Override
-    public Long selectIntegral(String type) {
-        return userIntegralMapper.selectIntegral(type);
+
+    public static void main(String[] args) {
+        System.out.println(new Date().getTime());
     }
+
     /**
      * 修改积分规则
      * 每次事件对应积分数

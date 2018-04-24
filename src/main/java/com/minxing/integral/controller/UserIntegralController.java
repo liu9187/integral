@@ -72,64 +72,31 @@ public class UserIntegralController {
 
 
     }
+
     /**
      * 增加积分
-     *
-     * @param userId
-     * @param integralStr
+     * @param userId  用户id
+     * @param extParams  扩展参数（为后续准备）
+     * @param actionType 事件常量
      * @return result.toJSONString()
      */
     @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST} )
     @ResponseBody
-    public String addIntegral(@RequestParam Integer userId,@RequestParam String integralStr ) {
-        JSONObject result = new JSONObject();
-        logger.info("Receive exchange register request with userId:" + userId + "  integralStr: " +integralStr );
-
-        if (userId == null || StringUtil.isNull(integralStr)) {
-            ErrorJson errorJson=new ErrorJson("20004","参数问题");
-            return  errorJson.toJson();
-        } else {
-            try {
-
-                Map<String,Object> params=new HashMap<String,Object>();
-                //根据事件的类型查出对应的积分数
-                Long integral=userIntegralService.selectIntegral(integralStr);
-                switch (integralStr){
-                    case "OCU_ARTICLE_READ":
-                         params.put("integralId",1);
-                         break;
-                    case  "OCU_ARTICLE_COMMENT" :
-                        params.put("integralId",2);
-                         break;
-                    case "OCU_ARTICLE_FORWARD":
-                         params.put("integralId",3);
-                         break;
-                     default:
-                         ErrorJson errorJson=new ErrorJson("20004","参数问题");
-                         return  errorJson.toJson();
-
-                }
-                params.put("integral",integral);
-                params.put("userId",userId);
-                int out = userIntegralService.addIntegralByUserId(params);
-                if (out > 0) {
-                    result.put("message", "增加积分成功");
-                } else {
-                    ErrorJson errorJson = new ErrorJson("20004", "参数问题");
-
-                    return errorJson.toJson();
-
-                }
-
-            } catch (Exception e) {
-
-                logger.error("Error in removeUserIntegralByUserId relation", e);
-                e.getMessage();
-            }
-            return result.toJSONString();
+    public Object addIntegral(@RequestParam Integer userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) {
+        logger.info("Receive exchange register request with userId:"+ userId +" actionType:" + actionType);
+        if (userId == null || StringUtil.isNull(actionType)) {
+            ErrorJson errorJson = new ErrorJson("20004","参数问题");
+            response.setStatus(400);
+            return errorJson;
         }
-
-
+        Boolean res = userIntegralService.addIntegralByUserId(userId, actionType, extParams);
+        if (!res){
+            ErrorJson errorJson = new ErrorJson("20002","增加积分失败");
+            response.setStatus(400);
+            return  errorJson;
+        }
+        response.setStatus(200);
+        return "successful";
     }
 
     /**
