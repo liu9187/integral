@@ -40,6 +40,12 @@ public interface UserIntegralService {
      * @param type
      * @return
      */
-    Integer updateIntegralByType(String type);
+    Integer updateIntegralByType(String type,Integer integral);
+
+    /**
+     * 初始化页面 积分设置查询
+     * @return
+     */
+    Integer selectExchange();
 
 }

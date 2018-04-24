@@ -22,14 +22,14 @@ public interface UserIntegralMapper {
      * @param userIntegral
      * @return
      */
-    @Update("UPDATE user_infos SET integral=integral-#{integral} WHERE user_id=#{userId}")
+    @Update("UPDATE user_infos SET integral=integral-#{integral} WHERE user_id=#{userId} AND integral>#{integral}")
     Integer  removeUserIntegralByUserId(UserInfos userIntegral);
 
     /**
      * 积分管理 升序
      * @return IntegralManagementVO
      */
-    @Select("SELECT u.`name`,ui.integral,dept.short_name FROM users u " +
+    @Select("SELECT u.id,u.`name`,ui.integral,dept.short_name FROM users u " +
             "LEFT JOIN  user_infos ui ON ui.user_id=u.id " +
             "LEFT JOIN  departments dept  ON dept.id=u.dept_id " +
             "ORDER BY ui.integral ")
@@ -38,7 +38,7 @@ public interface UserIntegralMapper {
      * 积分管理 降序
      * @return IntegralManagementVO
      */
-    @Select("SELECT u.`name`,ui.integral,dept.short_name FROM users u " +
+    @Select("SELECT u.id,u.`name`,ui.integral,dept.short_name FROM users u " +
             "LEFT JOIN  user_infos ui ON ui.user_id=u.id " +
             "LEFT JOIN  departments dept  ON dept.id=u.dept_id " +
             "ORDER BY ui.integral DESC")
@@ -58,26 +58,18 @@ public interface UserIntegralMapper {
     Integer updateIntegral(Integer integralExchange);
 
     /**
-     * 通过userid 查询 积分
-     * @param userId
+     * 通过usrid增加积分
      * @return
      */
-    @Select("SELECT integral FROM user_integral WHERE user_id=#{userId}")
-    Long queryIntegralByUserId(Integer userId);
-
-    /**
-     * 通过userid增加积分
-     * @return
-     */
-    @Update("UPDATE user_infos SET integral=integral+#{integrals} WHERE user_id=#{userId};")
-    Integer addIntegralByUserId(@Param("userId") Integer userId, @Param("integrals")Integer integrals);
+    @Update("UPDATE user_infos SET integral=integral+#{integral} WHERE user_id=#{userId}")
+    Integer addIntegralByUserId(@Param("integral") Integer userId, @Param("integral") Integer integral);
 
     /**
      * 根据事件查询对应时间的积分
      * @param type
      * @return integral
      */
-    @Select("SELECT id, type, integral FROM integral where type=#{type}")
+    @Select("SELECT integral FROM integral where type=#{type}")
     Integral selectIntegral(String type);
 
     /**
@@ -86,8 +78,8 @@ public interface UserIntegralMapper {
      * @param type
      * @return
      */
-    @Update("UPDATE integral SET integral=6 WHERE type=#{type}")
-    Integer updateIntegralByType(String type);
+    @Update("UPDATE integral SET integral=#{integral} WHERE type=#{type}")
+    Integer updateIntegralByType(@Param("type") String type,@Param("integral") Integer integral);
 
 
     /**
@@ -95,7 +87,14 @@ public interface UserIntegralMapper {
      * @param integralRecord
      * @return
      */
-    @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});\n")
+    @Insert("INSERT INTO `integral_record` (`id`, `integral_id`, `user_id`, `create_date`) VALUES (null, #{integralId}, #{userId}, #{createDate};")
     Integer insertIntegralRecord(IntegralRecord integralRecord);
+
+    /**
+     * 初始化页面 积分设置查询
+     * @return
+     */
+    @Select("SELECT integral_exchange FROM integral_exchange  WHERE id=1")
+    Integer selectExchange();
 }
 

@@ -2,6 +2,10 @@ package com.minxing.integral.common.pojo.vo;
 
 public class IntegralManagementVO {
     /**
+     * id
+     */
+    private  Integer id;
+    /**
      * 用户积分
      */
     private  Long integral;
@@ -13,6 +17,14 @@ public class IntegralManagementVO {
      * 部门名称
      */
     private String shortName;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Long getIntegral() {
         return integral;

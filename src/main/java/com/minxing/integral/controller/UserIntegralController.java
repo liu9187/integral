@@ -3,7 +3,6 @@ package com.minxing.integral.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.minxing.integral.common.bean.Integral;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.util.ErrorJson;
@@ -34,9 +33,9 @@ public class UserIntegralController {
     /**
      * 积分兑换
      *
-     * @param
-     * @param
-     * @return
+     * @param userId  用户id
+     * @param integral  积分
+     * @return result 积分兑换结果
      */
     @RequestMapping(value = "/removeUserIntegralByUserId", method = {RequestMethod.PUT})
     @ResponseBody
@@ -49,7 +48,7 @@ public class UserIntegralController {
             return  errorJson.toJson();
         } else {
             try {
-                     UserInfos userIntegral=new UserInfos();
+                       UserInfos userIntegral=new UserInfos();
                          userIntegral.setIntegral(integral);
                          userIntegral.setUserId(userId);
                 int out = userIntegralService.removeUserIntegralByUserId(userIntegral);
@@ -101,18 +100,18 @@ public class UserIntegralController {
 
     /**
      * 设置积分规则 根据事件类型
-     * @param type
+     * @param type 积分增加类型
      * @return
      */
-    @RequestMapping(value = "/addIntegral", method = {RequestMethod.PUT} )
+    @RequestMapping(value = "/updateIntegralByType", method = {RequestMethod.PUT} )
     @ResponseBody
-    public String updateIntegralByType(@RequestParam String type){
+    public String updateIntegralByType(@RequestParam String type ,@RequestParam Integer integral){
              JSONObject jsonObject=new JSONObject();
-          if (StringUtil.isNull(type)){
+          if (StringUtil.isNull(type)||integral==null){
               ErrorJson errorJson = new ErrorJson("20004", "参数问题");
               return errorJson.toJson();
           }else{
-           Integer out= userIntegralService.updateIntegralByType(type);
+           Integer out= userIntegralService.updateIntegralByType(type,integral);
               if (out>0){
                    jsonObject.put("message","修改成功");
               }else {
@@ -126,9 +125,9 @@ public class UserIntegralController {
     /**
      * 积分管理页面显示
      *
-     * @param pageNum
-     * @param pageSize
-     * @param order
+     * @param pageNum 当前页
+     * @param pageSize 当前页记录
+     * @param order 排序
      */
     @RequestMapping(value = "/queryList", method = {RequestMethod.GET})
     @ResponseBody
@@ -153,8 +152,9 @@ public class UserIntegralController {
 
     /**
      * 积分设置
-     * @param
-     * @param response
+     * @param integralModification 积分设置参数
+     * @return  jsonObject  返回结果
+     *
      */
     @RequestMapping(value = "/updateIntegral", method = {RequestMethod.PUT})
     @ResponseBody
@@ -183,5 +183,25 @@ public class UserIntegralController {
                return   jsonObject.toJSONString();
 
     }
+
+    /**
+     * 初始化设置
+     * @return  jsonObject.toJSONString() 设置的积分参数
+     */
+    @RequestMapping(value = "/selectExchange", method = {RequestMethod.GET})
+    @ResponseBody
+  public   String selectExchange(){
+        JSONObject jsonObject=new JSONObject();
+        try {
+            Integer exchange= userIntegralService.selectExchange();
+            jsonObject.put("exchange",exchange);
+            jsonObject.put("message","初始化设置成功");
+            jsonObject.put("code","200");
+        }catch (Exception e){
+              e.getMessage();
+        }
+
+        return jsonObject.toJSONString();
+  }
 
 }
