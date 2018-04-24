@@ -102,7 +102,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             IntegralRecord integralRecord = new IntegralRecord();
             integralRecord.setIntegralId(integral.getId());
             integralRecord.setUserId(userId.toString());
-            integralRecord.setCreateDate(new Date().getTime());
+            integralRecord.setCreateDate(new Date().getTime()/1000);
 
             Integer rest = userIntegralMapper.insertIntegralRecord(integralRecord);
             if(1 != rest){
@@ -110,6 +110,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 return false;
             }
         }catch (Exception e){
+            e.printStackTrace();
             logger.error("event operation error");
             return false;
         }

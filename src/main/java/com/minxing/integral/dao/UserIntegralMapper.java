@@ -66,18 +66,18 @@ public interface UserIntegralMapper {
     Long queryIntegralByUserId(Integer userId);
 
     /**
-     * 通过usrid增加积分
+     * 通过userid增加积分
      * @return
      */
-    @Update("UPDATE user_infos SET integral=integral+#{integral} WHERE user_id=#{userId}")
-    Integer addIntegralByUserId(@Param("integral") Integer userId, @Param("integral") Integer integral);
+    @Update("UPDATE user_infos SET integral=integral+#{integrals} WHERE user_id=#{userId};")
+    Integer addIntegralByUserId(@Param("userId") Integer userId, @Param("integrals")Integer integrals);
 
     /**
      * 根据事件查询对应时间的积分
      * @param type
      * @return integral
      */
-    @Select("SELECT integral FROM integral where type=#{type}")
+    @Select("SELECT id, type, integral FROM integral where type=#{type}")
     Integral selectIntegral(String type);
 
     /**
@@ -95,7 +95,7 @@ public interface UserIntegralMapper {
      * @param integralRecord
      * @return
      */
-    @Insert("INSERT INTO `integral_record` (`id`, `integral_id`, `user_id`, `create_date`) VALUES (null, #{integralId}, #{userId}, #{createDate};")
+    @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});\n")
     Integer insertIntegralRecord(IntegralRecord integralRecord);
 }
 
