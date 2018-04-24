@@ -116,10 +116,6 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         return true;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Date().getTime());
-    }
-
     /**
      * 修改积分规则
      * 每次事件对应积分数
