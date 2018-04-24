@@ -24,6 +24,7 @@ import java.util.List;
  * @date 2018-04-17
  */
 @Controller
+@RequestMapping("/api/v2/integral")
 public class UserIntegralController {
     Logger logger = LoggerFactory.getLogger(UserIntegralController.class);
 
@@ -78,9 +79,9 @@ public class UserIntegralController {
      * @param
      * @return
      */
-    @RequestMapping(value = "/addIntegralByUserId", method = {RequestMethod.POST} )
+    @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST} )
     @ResponseBody
-    public String addIntegralByUserId(@RequestParam Integer userId,@RequestParam Long integral ) {
+    public String addIntegral(@RequestParam Integer userId,@RequestParam Long integral ) {
         JSONObject result = new JSONObject();
         logger.info("Receive exchange register request with userId:" + userId + "  integral: " +integral );
 
