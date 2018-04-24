@@ -1,10 +1,10 @@
 package com.minxing.integral.service;
 
-import com.minxing.integral.common.bean.UserIntegral;
+import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserIntegralService {
     /**
@@ -12,7 +12,7 @@ public interface UserIntegralService {
      * @param userIntegral
      * @return
      */
-    Integer removeUserIntegralByUserId(UserIntegral userIntegral);
+    Integer removeUserIntegralByUserId(UserInfos userIntegral);
 
     /**
      * 积分管理数据显示
@@ -29,8 +29,23 @@ public interface UserIntegralService {
 
     /**
      * 增加积分
-     * @param userIntegral
+     * @param params
      * @return
      */
-    Integer addIntegralByUserId(UserIntegral userIntegral);
+    Integer addIntegralByUserId(Map params);
+    /**
+     * 根据事件查询对应时间的积分
+     * @param type
+     * @return integral
+     */
+    Long selectIntegral(String type);
+
+    /**
+     * 修改积分规则
+     * 每次事件对应积分数
+     * @param type
+     * @return
+     */
+    Integer updateIntegralByType(String type);
+
 }

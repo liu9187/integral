@@ -3,10 +3,10 @@ package com.minxing.integral.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.minxing.integral.common.bean.UserIntegral;
+import com.minxing.integral.common.bean.Integral;
+import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.util.ErrorJson;
-import com.minxing.integral.common.util.ServletUtil;
 import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.service.UserIntegralService;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.util.*;
 
 /**
  * 用户积分controller
@@ -49,7 +49,7 @@ public class UserIntegralController {
             return  errorJson.toJson();
         } else {
             try {
-                     UserIntegral userIntegral=new UserIntegral();
+                     UserInfos userIntegral=new UserInfos();
                          userIntegral.setIntegral(integral);
                          userIntegral.setUserId(userId);
                 int out = userIntegralService.removeUserIntegralByUserId(userIntegral);
@@ -75,25 +75,43 @@ public class UserIntegralController {
     /**
      * 增加积分
      *
-     * @param
-     * @param
-     * @return
+     * @param userId
+     * @param integralStr
+     * @return result.toJSONString()
      */
     @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST} )
     @ResponseBody
-    public String addIntegral(@RequestParam Integer userId,@RequestParam Long integral ) {
+    public String addIntegral(@RequestParam Integer userId,@RequestParam String integralStr ) {
         JSONObject result = new JSONObject();
-        logger.info("Receive exchange register request with userId:" + userId + "  integral: " +integral );
+        logger.info("Receive exchange register request with userId:" + userId + "  integralStr: " +integralStr );
 
-        if (userId == null || integral == null) {
+        if (userId == null || StringUtil.isNull(integralStr)) {
             ErrorJson errorJson=new ErrorJson("20004","参数问题");
             return  errorJson.toJson();
         } else {
             try {
-                UserIntegral userIntegral=new UserIntegral();
-                userIntegral.setIntegral(integral);
-                userIntegral.setUserId(userId);
-                int out = userIntegralService.addIntegralByUserId(userIntegral);
+
+                Map<String,Object> params=new HashMap<String,Object>();
+                //根据事件的类型查出对应的积分数
+                Long integral=userIntegralService.selectIntegral(integralStr);
+                switch (integralStr){
+                    case "OCU_ARTICLE_READ":
+                         params.put("integralId",1);
+                         break;
+                    case  "OCU_ARTICLE_COMMENT" :
+                        params.put("integralId",2);
+                         break;
+                    case "OCU_ARTICLE_FORWARD":
+                         params.put("integralId",3);
+                         break;
+                     default:
+                         ErrorJson errorJson=new ErrorJson("20004","参数问题");
+                         return  errorJson.toJson();
+
+                }
+                params.put("integral",integral);
+                params.put("userId",userId);
+                int out = userIntegralService.addIntegralByUserId(params);
                 if (out > 0) {
                     result.put("message", "增加积分成功");
                 } else {
@@ -112,6 +130,30 @@ public class UserIntegralController {
         }
 
 
+    }
+
+    /**
+     * 设置积分规则 根据事件类型
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/addIntegral", method = {RequestMethod.PUT} )
+    @ResponseBody
+    public String updateIntegralByType(@RequestParam String type){
+             JSONObject jsonObject=new JSONObject();
+          if (StringUtil.isNull(type)){
+              ErrorJson errorJson = new ErrorJson("20004", "参数问题");
+              return errorJson.toJson();
+          }else{
+           Integer out= userIntegralService.updateIntegralByType(type);
+              if (out>0){
+                   jsonObject.put("message","修改成功");
+              }else {
+                  ErrorJson errorJson = new ErrorJson("20003", "设置积分规则失败");
+                  return errorJson.toJson();
+              }
+          }
+        return jsonObject.toJSONString();
     }
 
     /**

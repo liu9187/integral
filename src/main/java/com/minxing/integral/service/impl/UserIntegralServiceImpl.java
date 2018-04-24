@@ -1,6 +1,6 @@
 package com.minxing.integral.service.impl;
 
-import com.minxing.integral.common.bean.UserIntegral;
+import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.UserIntegralService;
@@ -28,7 +28,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      */
     @Override
     @Transactional
-    public Integer removeUserIntegralByUserId(UserIntegral userIntegral) {
+    public Integer removeUserIntegralByUserId(UserInfos userIntegral) {
        Long integral= userIntegralMapper.queryIntegralByUserId(userIntegral.getUserId());
          if (integral<userIntegral.getIntegral()){
              return -1;
@@ -76,12 +76,33 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     /**
      * 增加积分
-     * @param userIntegral
+     * @param params
      * @return
      */
     @Override
-    public Integer addIntegralByUserId(UserIntegral userIntegral) {
+    @Transactional
+    public Integer addIntegralByUserId(Map params) {
+        UserInfos userIntegral=new UserInfos();
         return userIntegralMapper.addIntegralByUserId(userIntegral);
+    }
+    /**
+     * 根据事件查询对应时间的积分
+     * @param type
+     * @return integral
+     */
+    @Override
+    public Long selectIntegral(String type) {
+        return userIntegralMapper.selectIntegral(type);
+    }
+    /**
+     * 修改积分规则
+     * 每次事件对应积分数
+     * @param type
+     * @return
+     */
+    @Override
+    public Integer updateIntegralByType(String type) {
+        return userIntegralMapper.updateIntegralByType(type);
     }
 
 

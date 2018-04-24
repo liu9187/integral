@@ -6,61 +6,31 @@ package com.minxing.integral.common.bean;
  * @Date 2018-4-17
  */
 public class Integral {
-    private  Integer integralId;
-    /**
-     * 阅读积分
-     */
-    private  Integer readingIntegral;
-    /**
-     * 评论积分
-     */
-    private  Integer commentaryIntegral;
-    /**
-     * 转发积分
-     */
-    private  Integer forwardIntegral;
-    /**
-     * 积分设置
-     */
-    private  Integer integralModification;
+    private Integer id;
+    private String type;
+    private Long integral ;
 
-    public Integer getIntegralModification() {
-        return integralModification;
+    public Integer getId() {
+        return id;
     }
 
-    public void setIntegralModification(Integer integralModification) {
-        this.integralModification = integralModification;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Integer getIntegralId() {
-        return integralId;
+    public String getType() {
+        return type;
     }
 
-    public void setIntegralId(Integer integralId) {
-        this.integralId = integralId;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Integer getReadingIntegral() {
-        return readingIntegral;
+    public Long getIntegral() {
+        return integral;
     }
 
-    public void setReadingIntegral(Integer readingIntegral) {
-        this.readingIntegral = readingIntegral;
-    }
-
-    public Integer getCommentaryIntegral() {
-        return commentaryIntegral;
-    }
-
-    public void setCommentaryIntegral(Integer commentaryIntegral) {
-        this.commentaryIntegral = commentaryIntegral;
-    }
-
-    public Integer getForwardIntegral() {
-        return forwardIntegral;
-    }
-
-    public void setForwardIntegral(Integer forwardIntegral) {
-        this.forwardIntegral = forwardIntegral;
+    public void setIntegral(Long integral) {
+        this.integral = integral;
     }
 }
