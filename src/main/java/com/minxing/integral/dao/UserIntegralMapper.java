@@ -11,6 +11,7 @@ import com.minxing.integral.common.util.StringUtil;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -90,6 +91,17 @@ public interface UserIntegralMapper {
     Integer insertIntegralRecord(IntegralRecord integralRecord);
 
     /**
+     * 新增一条有效记录
+     * @param userId
+     * @param articleId
+     * @param createDate
+     * @return
+     */
+    @Insert("INSERT INTO valid_event (user_id, article_id, create_date) VALUES (#{userId}, #{articleId}, #{createDate});")
+    Integer addValidEvent(@Param("userId") Integer userId, @Param("articleId") Integer articleId, @Param("createDate") Date createDate);
+
+
+    /**
      * 初始化页面 积分设置查询
      * @return
      */
@@ -106,7 +118,14 @@ public interface UserIntegralMapper {
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
  List<OrdinaryUserVO>  ordinaryUser(@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd);
-
+    /**
+     * 查看是否记录有效事件
+     * @param userId
+     * @param articleId
+     * @return
+     */
+    @Select("SELECT COUNT(id) FROM `valid_event` WHERE user_id = #{userId} AND article_id = #{articleId};")
+    Integer findIsValid(@Param("userId") Integer userId, @Param("articleId") Integer articleId);
     /**
      * 特殊用户
      * @param type 类型  阅读 read  评论 comment 合计 count

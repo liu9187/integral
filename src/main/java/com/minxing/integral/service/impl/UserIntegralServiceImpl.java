@@ -5,6 +5,8 @@ import com.minxing.integral.common.bean.Integral;
 import com.minxing.integral.common.bean.IntegralRecord;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
+import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
+import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.UserIntegralService;
@@ -37,10 +39,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     @Override
     @Transactional
     public Integer removeUserIntegralByUserId(UserInfos userIntegral) {
-       Long integral= userIntegralMapper.queryIntegralByUserId(userIntegral.getUserId());
-         if (integral<userIntegral.getIntegral()){
-             return -1;
-         }
+
         return userIntegralMapper.removeUserIntegralByUserId(userIntegral);
     }
 
@@ -51,13 +50,13 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<IntegralManagementVO> queryList(String order) {
+    public List<IntegralManagementVO> queryList(Integer order) {
         List<IntegralManagementVO> list=new ArrayList<>();
         try {
 
-            if (order.equals("ASC")) {
+            if (order==1) {
                 list= userIntegralMapper.queryListByASC();
-            } else if (order.equals("DESC")) {
+            } else if (order==0) {
                 list= userIntegralMapper.queryListByDESC();
             } else {
                 System.out.print("积分显示方法输入参数出现错误" + order);
@@ -145,8 +144,35 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public Integer updateIntegralByType(String type) {
-        return userIntegralMapper.updateIntegralByType(type);
+    public Integer updateIntegralByType(String type,Integer integral) {
+        return userIntegralMapper.updateIntegralByType(type,integral);
+    }
+
+    /**
+     * 初始化
+     * @return
+     */
+    @Override
+    public Integer selectExchange() {
+        return userIntegralMapper.selectExchange();
+    }
+
+    /**
+     *
+     * @param type 类型  阅读 read  评论 comment 合计 count
+     * @param order  排序  0 降序  1升序
+     * @param timeStart 开始时间
+     * @param timeEnd 结束时间
+     * @return
+     */
+    @Override
+    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd) {
+        return userIntegralMapper.ordinaryUser(type,order,timeStart,timeEnd);
+    }
+
+    @Override
+    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd) {
+        return userIntegralMapper.SpecialUser(type,order,timeStart,timeEnd);
     }
 
 
