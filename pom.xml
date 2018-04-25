@@ -203,7 +203,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.minxing.mx_integral.StartUp</mainClass>
+                            <mainClass>com.minxing.integral.StartUp</mainClass>
                             <outputDirectory>target/ewhine_pkg/mx_integral</outputDirectory>
                         </configuration>
                     </execution>

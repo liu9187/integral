@@ -36,7 +36,7 @@ public interface UserIntegralService {
      * @param
      * @return
      */
-    Boolean addIntegralByUserId(Integer userId, String actionType, String extParams);
+    Boolean addIntegralByUserId(String userId, String actionType, String extParams);
 
     /**
      * 修改积分规则
