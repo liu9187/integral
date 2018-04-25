@@ -84,7 +84,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      */
     @Override
     @Transactional
-    public Boolean addIntegralByUserId(Integer userId, String actionType, String extParams) {
+    public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
         try {
             //根据事件的类型查出对应积分数据
             Integral integral = userIntegralMapper.selectIntegral(actionType);
@@ -93,7 +93,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 return false;
             }
             //增加积分
-            Integer res = userIntegralMapper.addIntegralByUserId(userId, integral.getIntegral().intValue());
+            Integer res = userIntegralMapper.addIntegralByUserId(Integer.valueOf(userId), integral.getIntegral().intValue());
             if(1 != res){
                 logger.error("add integral error");
                 return false;
@@ -101,7 +101,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             //记录此次事件
             IntegralRecord integralRecord = new IntegralRecord();
             integralRecord.setIntegralId(integral.getId());
-            integralRecord.setUserId(userId.toString());
+            integralRecord.setUserId(userId);
             integralRecord.setCreateDate(new Date().getTime()/1000);
 
             Integer rest = userIntegralMapper.insertIntegralRecord(integralRecord);

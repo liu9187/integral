@@ -82,7 +82,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST} )
     @ResponseBody
-    public Object addIntegral(@RequestParam Integer userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) {
+    public Object addIntegral(@RequestParam String userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) {
         logger.info("Receive exchange register request with userId:"+ userId +" actionType:" + actionType);
         if (userId == null || StringUtil.isNull(actionType)) {
             ErrorJson errorJson = new ErrorJson("20004","参数问题");
