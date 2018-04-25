@@ -1,0 +1,84 @@
+#! /bin/sh
+#
+# Init Script to run ewhine_search in daemon mode at boot time.
+# chkconfig: - 74 60
+# description: mx_lbs daemon
+# processname: mx_lbs
+#
+# Run "/sbin/chkconfig --add ewhine_search" to add the Run levels.
+# This will setup the symlinks and set the process to run at boot.#
+
+. /etc/rc.d/init.d/functions
+
+if [ -f /opt/ewhine/etc/init.d/mx_env ]; then
+  . /opt/ewhine/etc/init.d/mx_env
+fi
+
+DAEMON="/usr/bin/java"
+DESC=mx_lbs
+
+min_heap_size="128m"
+max_heap_size="512m"
+
+serverdir=/home/ewhine/deploy/mx_lbs
+serverjar=*.jar
+server_temp=$serverdir/tmp
+server_logs=$serverdir/logs
+server_name="mx_lbs"
+PIDFILE=/home/ewhine/var/run/$server_name.pid
+USER=ewhine
+DB_ENV=production
+
+test -x $DAEMON || exit 0
+test -x $serverdir || exit 0
+
+set -e
+
+iden=mx_lbs
+identity="-Didentity=$iden"
+
+ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
+
+case "$1" in
+  start)
+    PID=`ps aux|grep $iden|grep -v grep|awk '{print $2}'`
+    if [ -f $PIDFILE  ]; then
+        if [ "`cat $PIDFILE`" == "$PID" ] && [ "$PID" != "" ] ; then
+            echo "$server_name has already been started!"
+            exit 0;
+        else
+            echo "$server_name may be crashed.Will start it."
+        fi
+    fi
+        echo -n "Starting $DESC... "
+        touch $PIDFILE
+        chown "$USER" $PIDFILE
+        if start-stop-daemon --start --chdir $serverdir --quiet --make-pidfile --pidfile $PIDFILE --background --chuid "$USER" --exec $DAEMON -- $identity $ARGS
+        then
+                echo "done."
+        else
+                echo "failed"
+        fi
+        ;;
+  stop)
+        echo -n "Stopping $DESC... "
+        if start-stop-daemon --stop --retry 10 --quiet --pidfile $PIDFILE
+        then
+                echo "done."
+        else
+                echo "failed"
+        fi
+        rm -f $PIDFILE
+        ;;
+
+  restart|force-reload)
+        ${0} stop
+        ${0} start
+        ;;
+  *)
+        echo "Usage: /etc/init.d/$server_name {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
