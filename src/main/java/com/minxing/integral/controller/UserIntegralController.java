@@ -77,26 +77,25 @@ public class UserIntegralController {
 
     /**
      * 增加积分
-     *
-     * @param userId     用户id
+     * @param userId  用户id
      * @param extParams  扩展参数（为后续准备）
      * @param actionType 事件常量
      * @return result.toJSONString()
      */
-    @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST})
+    @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST} )
     @ResponseBody
     public Object addIntegral(@RequestParam String userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) {
-        logger.info("Receive exchange register request with userId:" + userId + " actionType:" + actionType);
+        logger.info("Receive exchange register request with userId:"+ userId +" actionType:" + actionType);
         if (userId == null || StringUtil.isNull(actionType)) {
-            ErrorJson errorJson = new ErrorJson("20004", "参数问题");
+            ErrorJson errorJson = new ErrorJson("20004","参数问题");
             response.setStatus(400);
             return errorJson;
         }
         Boolean res = userIntegralService.addIntegralByUserId(userId, actionType, extParams);
-        if (!res) {
-            ErrorJson errorJson = new ErrorJson("20002", "增加积分失败");
+        if (!res){
+            ErrorJson errorJson = new ErrorJson("20002","增加积分失败");
             response.setStatus(400);
-            return errorJson;
+            return  errorJson;
         }
         response.setStatus(200);
         return "successful";

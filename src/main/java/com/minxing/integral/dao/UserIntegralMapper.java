@@ -58,18 +58,18 @@ public interface UserIntegralMapper {
     Integer updateIntegral(Integer integralExchange);
 
     /**
-     * 通过usrid增加积分
+     * 通过userid增加积分
      * @return
      */
-    @Update("UPDATE user_infos SET integral=integral+#{integral} WHERE user_id=#{userId}")
-    Integer addIntegralByUserId(@Param("integral") Integer userId, @Param("integral") Integer integral);
+    @Update("UPDATE user_infos SET integral=integral+#{integrals} WHERE user_id=#{userId};")
+    Integer addIntegralByUserId(@Param("userId") Integer userId, @Param("integrals") Integer integrals);
 
     /**
      * 根据事件查询对应时间的积分
      * @param type
      * @return integral
      */
-    @Select("SELECT integral FROM integral where type=#{type}")
+    @Select("SELECT id, type, integral FROM integral where type=#{type}")
     Integral selectIntegral(String type);
 
     /**
@@ -87,7 +87,7 @@ public interface UserIntegralMapper {
      * @param integralRecord
      * @return
      */
-    @Insert("INSERT INTO `integral_record` (`id`, `integral_id`, `user_id`, `create_date`) VALUES (null, #{integralId}, #{userId}, #{createDate};")
+    @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});\n")
     Integer insertIntegralRecord(IntegralRecord integralRecord);
 
     /**
@@ -100,6 +100,14 @@ public interface UserIntegralMapper {
     @Insert("INSERT INTO valid_event (user_id, article_id, create_date) VALUES (#{userId}, #{articleId}, #{createDate});")
     Integer addValidEvent(@Param("userId") Integer userId, @Param("articleId") Integer articleId, @Param("createDate") Date createDate);
 
+    /**
+     * 查看是否记录有效事件
+     * @param userId
+     * @param articleId
+     * @return
+     */
+    @Select("SELECT COUNT(id) FROM `valid_event` WHERE user_id = #{userId} AND article_id = #{articleId};")
+    Integer findIsValid(@Param("userId") Integer userId, @Param("articleId") Integer articleId);
 
     /**
      * 初始化页面 积分设置查询
@@ -118,14 +126,6 @@ public interface UserIntegralMapper {
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
  List<OrdinaryUserVO>  ordinaryUser(@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd);
-    /**
-     * 查看是否记录有效事件
-     * @param userId
-     * @param articleId
-     * @return
-     */
-    @Select("SELECT COUNT(id) FROM `valid_event` WHERE user_id = #{userId} AND article_id = #{articleId};")
-    Integer findIsValid(@Param("userId") Integer userId, @Param("articleId") Integer articleId);
     /**
      * 特殊用户
      * @param type 类型  阅读 read  评论 comment 合计 count
