@@ -7,6 +7,7 @@ import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -97,5 +98,24 @@ public interface UserIntegralMapper {
      */
     @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});\n")
     Integer insertIntegralRecord(IntegralRecord integralRecord);
+
+    /**
+     * 查看是否记录有效事件
+     * @param userId
+     * @param articleId
+     * @return
+     */
+    @Select("SELECT COUNT(id) FROM `valid_event` WHERE user_id = #{userId} AND article_id = #{articleId};")
+    Integer findIsValid(@Param("userId") Integer userId, @Param("articleId") Integer articleId);
+
+    /**
+     * 新增一条有效记录
+     * @param userId
+     * @param articleId
+     * @param createDate
+     * @return
+     */
+    @Insert("INSERT INTO valid_event (user_id, article_id, create_date) VALUES (#{userId}, #{articleId}, #{createDate});")
+    Integer addValidEvent(@Param("userId") Integer userId, @Param("articleId") Integer articleId, @Param("createDate") Date createDate);
 }
 

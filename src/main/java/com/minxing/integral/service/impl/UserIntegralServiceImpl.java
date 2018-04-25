@@ -1,5 +1,6 @@
 package com.minxing.integral.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.minxing.integral.common.bean.Integral;
 import com.minxing.integral.common.bean.IntegralRecord;
 import com.minxing.integral.common.bean.UserInfos;
@@ -10,6 +11,7 @@ import com.minxing.integral.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     @Autowired
     private UserIntegralMapper userIntegralMapper;
+
+    @Value("${event_type_is_valid}")
+    private String isValidEvent;
 
     /**
      * 积分兑换
@@ -86,6 +91,22 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     @Transactional
     public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
         try {
+            //判断是否是有效事件(只有阅读)
+            if(isValidEvent.equals(actionType)){
+                JSONObject json = JSONObject.parseObject(extParams);
+                Object articleId = json.get("article_id");
+                Integer res = userIntegralMapper.findIsValid(Integer.valueOf(userId), Integer.valueOf(articleId.toString()));
+                if(res > 0){
+                    logger.info("userId" +userId+ "and articleId" +articleId+ "is not valid event");
+                    return true;
+                }
+                //新增记录 下次阅读为无效事件
+                Integer ins = userIntegralMapper.addValidEvent(Integer.valueOf(userId), Integer.valueOf(articleId.toString()), new Date());
+                if(1 != ins){
+                    logger.error("add valid event error");
+                    return false;
+                }
+            }
             //根据事件的类型查出对应积分数据
             Integral integral = userIntegralMapper.selectIntegral(actionType);
             if(null == integral){
