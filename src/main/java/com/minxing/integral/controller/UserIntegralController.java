@@ -232,17 +232,17 @@ public class UserIntegralController {
             , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
         logger.info("ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize);
         JSONObject jsonObject=new JSONObject();
-        PageHelper.startPage(pageNum, pageSize);
         try {
-            List<OrdinaryUserVO>  vos = userIntegralService.ordinaryUser(type, order, timeStart, timeEnd);
+            List<OrdinaryUserVO>  vos = userIntegralService.ordinaryUser(type, order, timeStart, timeEnd,pageNum,pageSize);
             PageInfo<OrdinaryUserVO> page =new PageInfo(vos);
-
+               //把分页信息和查询结果加入到json对象当中
                jsonObject.put("code",200);
                jsonObject.put("pages",page.getPages());
                jsonObject.put("total",page.getTotal());
                jsonObject.put("vos",vos);
         }catch (Exception e){
-            e.getMessage();
+            //调用service 方法的时候出现错误
+            logger.error("error is controller ordinaryUser:"+e);
         }
 
         return jsonObject.toJSONString();
@@ -264,17 +264,17 @@ public class UserIntegralController {
             , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
         logger.info("ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize);
            JSONObject jsonObject=new JSONObject();
-          PageHelper.startPage(pageNum, pageSize);
         try {
-            List<SpecialUserVO>  vos = userIntegralService.specialUser(type, order, timeStart, timeEnd);
+            List<SpecialUserVO>  vos = userIntegralService.specialUser(type, order, timeStart, timeEnd,pageNum,pageSize);
             PageInfo<OrdinaryUserVO> page =new PageInfo(vos);
-
+            //把数据封装到json对象当中
             jsonObject.put("code",200);
             jsonObject.put("pages",page.getPages());
             jsonObject.put("total",page.getTotal());
             jsonObject.put("vos",vos);
         }catch (Exception e){
-            e.getMessage();
+            //调用业务的时候出现错误
+            logger.error("error controller specialUser:"+e);
         }
 
         return jsonObject.toJSONString();

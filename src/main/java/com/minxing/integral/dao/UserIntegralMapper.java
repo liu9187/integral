@@ -8,7 +8,10 @@ import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ServletUtil;
 import com.minxing.integral.common.util.StringUtil;
+import com.minxing.integral.controller.UserIntegralController;
 import org.apache.ibatis.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -22,6 +25,7 @@ import java.util.List;
 @Component
 @Mapper
 public interface UserIntegralMapper {
+
     /**
      * 积分兑换
      * @param userIntegral
@@ -87,7 +91,7 @@ public interface UserIntegralMapper {
      * @param integralRecord
      * @return
      */
-    @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});\n")
+    @Insert("INSERT INTO `integral_record` (`integral_id`, `user_id`, `create_date`) VALUES (#{integralId}, #{userId}, #{createDate});")
     Integer insertIntegralRecord(IntegralRecord integralRecord);
 
     /**
@@ -125,7 +129,7 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
- List<OrdinaryUserVO>  ordinaryUser(@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd);
+ List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd);
     /**
      * 特殊用户
      * @param type 类型  阅读 read  评论 comment 合计 count
@@ -135,16 +139,20 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "SpecialUser")
-    List<SpecialUserVO>  SpecialUser(@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd);
+    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd);
 
     class IntegralSqlBuilder{
-
-        public String ordinaryUser(@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
+        Logger logger = LoggerFactory.getLogger(IntegralSqlBuilder.class);
+        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
             StringBuffer sql =new StringBuffer();
             try {
-                sql.append("SELECT u.`name`, SUM(ir.integral_id=1) AS 'read' ,SUM(ir.integral_id=2) AS 'comment',SUM(ir.integral_id=1)+SUM(ir.integral_id=2) AS count FROM  users u  " +
-                        "LEFT JOIN integral_record ir ON ir.user_id=u.id  " +
-                        "WHERE  1=1 " );
+                sql.append("SELECT u.`name`, " +
+                        "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0) AS 'read' ," +
+                        "       IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)  AS 'comment'," +
+                        "       IF(SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0) AS count   " +
+                        "    FROM  users u  " +
+                        "    LEFT JOIN integral_record ir ON ir.user_id=u.id  " +
+                        "    WHERE   u.id not IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
@@ -181,10 +189,13 @@ public interface UserIntegralMapper {
                     }
                 }
             }catch (Exception e){
-                e.getMessage();
-                System.out.print("error sql is  ordinaryUser");
+                //普通用户sql出现错误
+                logger.error("error is mapper ordinaryUser: "+e);
+               // System.out.print("error sql is  ordinaryUser");
             }
-            System.out.println("查询sql=="+sql.toString());
+              //输出查询普通用户的sql语句
+             logger.info("查询sql=="+sql.toString());
+            //System.out.println("查询sql=="+sql.toString());
             return sql.toString();
         }
 
@@ -196,12 +207,18 @@ public interface UserIntegralMapper {
          * @param timeEnd
          * @return
          */
-        public String SpecialUser(@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
+        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
             StringBuffer sql =new StringBuffer();
             try {
-                sql.append("SELECT u.`name`, SUM(ir.integral_id=1) AS 'read' ,SUM(ir.integral_id=2) AS 'comment',SUM(ir.integral_id=3) AS 'forward',SUM(ir.integral_id=3)+SUM(ir.integral_id=2) AS count1,SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) AS count2 FROM  users u  " +
-                           "LEFT JOIN integral_record ir ON ir.user_id=u.id  " +
-                          "WHERE  1=1  " );
+                sql.append("SELECT u.`name`, " +
+                        "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0) AS 'read' ," +
+                        "       IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)  AS 'comment'," +
+                        "       IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0)  AS 'forward'," +
+                        "       IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0) AS count1, " +
+                        "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)+IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0) AS count2 " +
+                        "    FROM  users u  " +
+                        "    LEFT JOIN integral_record ir ON ir.user_id=u.id " +
+                        "    WHERE   u.id IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
@@ -255,10 +272,11 @@ public interface UserIntegralMapper {
                     }
                 }
             }catch (Exception e){
-                e.getMessage();
-                System.out.print("error sql is  SpecialUser");
+                //特殊用户sql出现错误日志
+                logger.error("error is mapper SpecialUser:"+e);
             }
-            System.out.println("查询sql=="+sql.toString());
+            logger.info("查询sql=="+sql.toString());
+            //System.out.println("查询sql=="+sql.toString());
             return sql.toString();
         }
     }

@@ -58,9 +58,11 @@ public interface UserIntegralService {
      * @param order  排序  0 降序  1升序
      * @param timeStart 开始时间
      * @param timeEnd 结束时间
+     * @param pageNum 当前页
+     * @param pageSize 当前页记录数量
      * @return
      */
-    List<OrdinaryUserVO>  ordinaryUser(String type,  Integer order ,  Long timeStart,  Long timeEnd);
+    List<OrdinaryUserVO>  ordinaryUser(String type,  Integer order ,  Long timeStart,  Long timeEnd,Integer pageNum,Integer pageSize);
 
     /**
      * 特殊用户
@@ -68,9 +70,11 @@ public interface UserIntegralService {
      * @param order  排序  0 降序  1升序
      * @param timeStart 开始时间
      * @param timeEnd 结束时间
+     * @param  pageNum 当前页
+     * @param  pageSize 当前页记录数量
      * @return
      */
-    List<SpecialUserVO>  specialUser(String type, Integer order , Long timeStart, Long timeEnd);
+    List<SpecialUserVO>  specialUser( String type, Integer order , Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize);
 
 
 }

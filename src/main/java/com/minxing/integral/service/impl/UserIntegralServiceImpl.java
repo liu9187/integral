@@ -1,6 +1,7 @@
 package com.minxing.integral.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
 import com.minxing.integral.common.bean.Integral;
 import com.minxing.integral.common.bean.IntegralRecord;
 import com.minxing.integral.common.bean.UserInfos;
@@ -29,7 +30,9 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     @Value("${event_type_is_valid}")
     private String isValidEvent;
-
+    //特殊用户群组id
+    @Value("${user.group.id}")
+    private Integer groupId;
     /**
      * 积分兑换
      *
@@ -154,21 +157,37 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     }
 
     /**
-     *
+     * 普通用户
      * @param type 类型  阅读 read  评论 comment 合计 count
      * @param order  排序  0 降序  1升序
      * @param timeStart 开始时间
      * @param timeEnd 结束时间
+     * @param  pageNum 当前页
+     * @param  pageSize 当前页记录数量
      * @return
      */
     @Override
-    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd) {
-        return userIntegralMapper.ordinaryUser(type,order,timeStart,timeEnd);
+    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize) {
+        //分页插件
+        PageHelper.startPage(pageNum, pageSize);
+        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd);
     }
 
+    /**
+     * 特殊用户
+     * @param type 类型  阅读 read  评论 comment 合计 count
+     * @param order  排序  0 降序  1升序
+     * @param timeStart 开始时间
+     * @param timeEnd 结束时间
+     * @param  pageNum 当前页
+     * @param  pageSize 当前页记录数量
+     * @return
+     */
     @Override
-    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd) {
-        return userIntegralMapper.SpecialUser(type,order,timeStart,timeEnd);
+    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize) {
+        //分页插件
+        PageHelper.startPage(pageNum, pageSize);
+        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd);
     }
 
 
