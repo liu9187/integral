@@ -36,13 +36,13 @@ public class InitListener {
     public void init(){
         logger.info("start init integral");
 
-        //user_info 尝试增加integral字段
-        try {
-            initMapper.findIntegralFromUserInfo();
-        }catch (Exception e){
-            logger.info("the integral not exist from user_info, start add the column integral");
-            initMapper.addColumnIntegral();
-        }
+        //user_info 尝试增加integral字段        ruby创建此字段
+//        try {
+//            initMapper.findIntegralFromUserInfo();
+//        }catch (Exception e){
+//            logger.info("the integral not exist from user_info, start add the column integral");
+//            initMapper.addColumnIntegral();
+//        }
 
         //尝试创建integral表
         try {
