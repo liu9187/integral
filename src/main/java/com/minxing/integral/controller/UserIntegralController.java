@@ -10,14 +10,18 @@ import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.service.UserIntegralService;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.List;
 
 /**
  * 用户积分controller
@@ -42,37 +46,39 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/removeUserIntegralByUserId", method = {RequestMethod.PUT})
     @ResponseBody
-    public String removeUserIntegralByUserId(@RequestParam Integer userId, @RequestParam Long integral) {
+    public String removeUserIntegralByUserId(@RequestParam Integer userId, @RequestParam Long integral, HttpServletResponse response) {
         JSONObject result = new JSONObject();
-        logger.info("Receive exchange register request with userId:" + userId + "  integral: " + integral);
-
+        // 接收到积分兑换请求
+        logger.info("Receive integral exchange request with userId:" + userId + "  integral: " + integral);
         if (userId == null || integral == null) {
             ErrorJson errorJson = new ErrorJson("20004", "参数问题");
+            // 参数错误返回http状态码400
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return errorJson.toJson();
         } else {
             try {
                 UserInfos userIntegral = new UserInfos();
                 userIntegral.setIntegral(integral);
                 userIntegral.setUserId(userId);
+                // 尝试进行积分兑换
                 int out = userIntegralService.removeUserIntegralByUserId(userIntegral);
                 if (out > 0) {
                     result.put("message", "兑换成功");
                 } else {
                     ErrorJson errorJson = new ErrorJson("20005", "积分余额不足");
-
+                    // 参数错误返回http状态码400
+                    response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     return errorJson.toJson();
-
                 }
-
             } catch (Exception e) {
-
                 logger.error("Error in removeUserIntegralByUserId relation", e);
-                e.getMessage();
+                // 程序异常返回http状态码500
+                ErrorJson errorJson = new ErrorJson("22222", "未知异常");
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                return errorJson.toJson();
             }
             return result.toJSONString();
         }
-
-
     }
 
     /**
@@ -109,10 +115,11 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/updateIntegralByType", method = {RequestMethod.PUT})
     @ResponseBody
-    public String updateIntegralByType(@RequestParam String type, @RequestParam Integer integral) {
+    public String updateIntegralByType(@RequestParam String type, @RequestParam Integer integral, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         if (StringUtil.isNull(type) || integral == null) {
             ErrorJson errorJson = new ErrorJson("20004", "参数问题");
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return errorJson.toJson();
         } else {
             Integer out = userIntegralService.updateIntegralByType(type, integral);
@@ -120,6 +127,7 @@ public class UserIntegralController {
                 jsonObject.put("message", "修改成功");
             } else {
                 ErrorJson errorJson = new ErrorJson("20003", "设置积分规则失败");
+                response.setStatus(HttpStatus.SC_BAD_REQUEST);
                 return errorJson.toJson();
             }
         }
@@ -144,11 +152,12 @@ public class UserIntegralController {
         PageHelper.startPage(pageNum, pageSize);
         List<IntegralManagementVO> vos = userIntegralService.queryList(order);
         PageInfo<IntegralManagementVO> pageInfo = new PageInfo<>(vos);
-
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("vos", vos);
-        jsonObject.put("pages", pageInfo.getPages());//总页数
-        jsonObject.put("total", pageInfo.getTotal());//总记录数
+        //总页数
+        jsonObject.put("pages", pageInfo.getPages());
+        //总记录数
+        jsonObject.put("total", pageInfo.getTotal());
         jsonObject.put("code", "200");
         return jsonObject.toJSONString();
 
@@ -164,29 +173,23 @@ public class UserIntegralController {
     @RequestMapping(value = "/updateIntegral", method = {RequestMethod.PUT})
     @ResponseBody
     public String updateIntegral(@RequestParam Integer integralModification, HttpServletResponse response) {
-
-
         if (integralModification.equals(null)) {
             ErrorJson errorJson = new ErrorJson("20004", "参数问题");
-
             return errorJson.toJson();
         }
-
         JSONObject jsonObject = new JSONObject();
-
         try {
-
             Integer result = userIntegralService.updateIntegral(integralModification);
             jsonObject.put("result", result);
             jsonObject.put("message", "积分设置成功");
             jsonObject.put("code", "200");
-
         } catch (Exception e) {
-            e.getMessage();
-            System.out.print("-----积分设置方法调用错误-------");
+            logger.error("Error in update integral exchange value", e);
+            ErrorJson errorJson = new ErrorJson("22222", "未知异常");
+            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return errorJson.toJson();
         }
         return jsonObject.toJSONString();
-
     }
 
     /**
@@ -196,7 +199,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/selectExchange", method = {RequestMethod.GET})
     @ResponseBody
-    public String selectExchange() {
+    public String selectExchange(HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         try {
             Integer exchange = userIntegralService.selectExchange();
@@ -204,9 +207,11 @@ public class UserIntegralController {
             jsonObject.put("message", "初始化设置成功");
             jsonObject.put("code", "200");
         } catch (Exception e) {
-            e.getMessage();
+            logger.error("Error in update select exchange value", e);
+            ErrorJson errorJson = new ErrorJson("22222", "未知异常");
+            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            return errorJson.toJson();
         }
-
         return jsonObject.toJSONString();
     }
 

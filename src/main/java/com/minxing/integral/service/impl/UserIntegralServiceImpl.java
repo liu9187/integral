@@ -53,21 +53,16 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     public List<IntegralManagementVO> queryList(Integer order) {
         List<IntegralManagementVO> list=new ArrayList<>();
         try {
-
             if (order==1) {
-                list= userIntegralMapper.queryListByASC();
-            } else if (order==0) {
-                list= userIntegralMapper.queryListByDESC();
+                list = userIntegralMapper.queryListByASC();
             } else {
-                System.out.print("积分显示方法输入参数出现错误" + order);
-
+                // 默认降序
+                list = userIntegralMapper.queryListByDESC();
             }
         } catch (Exception e) {
             logger.error("The error is queryList" + e);
         }
-
         return list;
-
     }
 
     /**
@@ -81,6 +76,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         return userIntegralMapper.updateIntegral(integralModification);
     }
 
+    //TODO 增加积分部分添加单独的接口供三方实现
     /**
      * 增加积分
      * @param
@@ -122,7 +118,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             IntegralRecord integralRecord = new IntegralRecord();
             integralRecord.setIntegralId(integral.getId());
             integralRecord.setUserId(userId);
-            integralRecord.setCreateDate(new Date().getTime()/1000);
+            integralRecord.setCreateDate(System.currentTimeMillis()/1000);
 
             Integer rest = userIntegralMapper.insertIntegralRecord(integralRecord);
             if(1 != rest){
