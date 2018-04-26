@@ -2,6 +2,7 @@ package com.minxing.integral;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "com.minxing.integral")
 @EnableTransactionManagement
+@ServletComponentScan(basePackages = "com.minxing.integral.filter")
 public class StartUp {
 
     public static void main(String[] args){

@@ -98,7 +98,7 @@
         <dependency>
             <groupId>com.minxing.token</groupId>
             <artifactId>minxing-token-jar</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
         <!--不使用tomcat -->
         <dependency>
