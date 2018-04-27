@@ -187,28 +187,19 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>utf8</encoding>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>1.5.2.RELEASE</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>com.minxing.integral.StartUp</mainClass>
-                            <outputDirectory>target/ewhine_pkg/mx_integral</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
             </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -235,6 +226,22 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>target/ewhine_pkg/mx_integral/shell</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>shell</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-bin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
                             <outputDirectory>target/ewhine_pkg/mx_integral/bin</outputDirectory>
                             <resources>
                                 <resource>
@@ -246,14 +253,43 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- 最小jar加lib文件夹依赖start -->
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>utf-8</encoding>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <mainClass>com.minxing.integral.StartUp</mainClass>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>target/ewhine_pkg/mx_integral</outputDirectory>
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                    </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                <!-- 读注：这里如果写不加变量的路径，比如target/ewhine_pkg/pns/lib，如果你的项目位置是D:\Projects\dhzh\pns，则这个target是指的D:\Projects\dhzh\pns\target -->
+                                target/ewhine_pkg/mx_integral/lib
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <resources>

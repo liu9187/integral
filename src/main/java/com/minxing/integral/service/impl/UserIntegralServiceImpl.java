@@ -10,6 +10,7 @@ import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.dao.UserIntegralMapper;
+import com.minxing.integral.service.IntegralService;
 import com.minxing.integral.service.UserIntegralService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     @Autowired
     private UserIntegralMapper userIntegralMapper;
+
+    private IntegralService integralService;
 
     @Value("${event_type_is_valid}")
     private String isValidEvent;
@@ -107,6 +110,9 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             }
             //根据事件的类型查出对应积分数据
             Integral integral = userIntegralMapper.selectIntegral(actionType);
+            if (integralService != null){
+                integral.setIntegral(integralService.calculate(actionType, extParams));
+            }
             if(null == integral){
                 logger.error("integral number error");
                 return false;
@@ -190,5 +196,11 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd);
     }
 
-
+    /**
+     * 支持特殊处理类
+     * @param integralService
+     */
+    public void setIntegralService(IntegralService integralService) {
+        this.integralService = integralService;
+    }
 }

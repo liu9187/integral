@@ -2,8 +2,8 @@
 #
 # Init Script to run ewhine_search in daemon mode at boot time.
 # chkconfig: - 74 60
-# description: mx_lbs daemon
-# processname: mx_lbs
+# description: mx_integral daemon
+# processname: mx_integral
 #
 # Run "/sbin/chkconfig --add ewhine_search" to add the Run levels.
 # This will setup the symlinks and set the process to run at boot.#
@@ -15,17 +15,18 @@ if [ -f /opt/ewhine/etc/init.d/mx_env ]; then
 fi
 
 DAEMON="/usr/bin/java"
-DESC=mx_lbs
+DESC=mx_integral
 
 min_heap_size="128m"
 max_heap_size="512m"
 
-serverdir=/home/ewhine/deploy/mx_lbs
+serverdir=/home/ewhine/deploy/mx_integral
 serverjar=*.jar
 server_temp=$serverdir/tmp
 server_logs=$serverdir/logs
-server_name="mx_lbs"
+server_name="mx_integral"
 PIDFILE=/home/ewhine/var/run/$server_name.pid
+server_thirdpartylib=$serverdir/thirdpartylib
 USER=ewhine
 DB_ENV=production
 
@@ -34,10 +35,11 @@ test -x $serverdir || exit 0
 
 set -e
 
-iden=mx_lbs
+iden=mx_integral
 identity="-Didentity=$iden"
 
-ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
+# ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
+ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*:$server_thirdpartylib/*:" com.minxing.integral.StartUp"
 
 case "$1" in
   start)

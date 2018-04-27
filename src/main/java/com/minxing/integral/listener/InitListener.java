@@ -2,6 +2,9 @@ package com.minxing.integral.listener;
 
 
 import com.minxing.integral.dao.InitMapper;
+import com.minxing.integral.service.IntegralService;
+import com.minxing.integral.service.UserIntegralService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,8 @@ public class InitListener {
 
     @Autowired
     private InitMapper initMapper;
+    @Autowired
+    private UserIntegralService userIntegralService;
 
     @Value("${read.default.integral}")
     private Integer readIntegral;
@@ -29,6 +34,9 @@ public class InitListener {
 
     @Value("${forward.default.integral}")
     private Integer forwardIntegral;
+
+    @Value("${integral.calculate.class}")
+    private String calculatClass;
 
     /**
      * 初始化数据库资源
@@ -76,6 +84,22 @@ public class InitListener {
         }catch (Exception e){
             logger.info("Table valid_event not exist, Start to create table");
             initMapper.initValidEvent();
+        }
+
+        // 尝试增加用户自定义积分处理
+        if (StringUtils.isNotEmpty(calculatClass)){
+            logger.info("User-defined integral computing classes are not empty.");
+            logger.info("Class name is " + calculatClass);
+            try{
+                IntegralService instance = (IntegralService) Class.forName(calculatClass).newInstance();
+                if (instance != null){
+                    userIntegralService.setIntegralService(instance);
+                    logger.info("Set the custom integral calculation class to be successful.");
+                }
+            }catch (Exception e){
+                logger.error("Error in generate user-defined integral computing class",e);
+            }
+
         }
     }
 }

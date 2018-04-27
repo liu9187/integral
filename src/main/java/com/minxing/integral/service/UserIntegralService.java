@@ -76,5 +76,10 @@ public interface UserIntegralService {
      */
     List<SpecialUserVO>  specialUser( String type, Integer order , Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize);
 
+    /**
+     * 设置特殊处理类
+     * @param integralService 用户自定义的处理类对象
+     */
+    void setIntegralService(IntegralService integralService);
 
 }
