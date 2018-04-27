@@ -65,7 +65,7 @@ public interface UserIntegralMapper {
      * 通过userid增加积分
      * @return
      */
-    @Update("UPDATE user_infos SET integral=integral+#{integrals} WHERE user_id=#{userId};")
+    @Update("UPDATE user_infos SET integral=IFNULL(integral,0)+#{integrals} WHERE user_id=#{userId};")
     Integer addIntegralByUserId(@Param("userId") Integer userId, @Param("integrals") Integer integrals);
 
     /**
