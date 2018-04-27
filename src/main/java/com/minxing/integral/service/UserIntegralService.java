@@ -9,6 +9,11 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 用户积分service
+ * @author liucl
+ * @date 2018-4-27
+ */
 public interface UserIntegralService {
     /**
      * 积分兑换服务
