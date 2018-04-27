@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.minxing.integral.common.bean.UserInfos;
+import com.minxing.integral.common.exception.IntegrationErrorException;
 import com.minxing.integral.common.exception.ParameterErrorException;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
@@ -55,12 +56,7 @@ public class UserIntegralController {
         if (userId == null || integral == null) {
             ErrorJson errorJson = null;
             // 参数错误返回http状态码400
-            try {
-                errorJson = new ErrorJson("20004", "参数问题");
-            } catch (Exception e) {
                 throw new ParameterErrorException();
-            }
-            return errorJson.toJson();
         } else {
             try {
                 //封装到对象
@@ -74,23 +70,11 @@ public class UserIntegralController {
                 } else {
                     ErrorJson errorJson = null;
                     // 参数错误返回http状态码400
-                    try {
-                        errorJson = new ErrorJson("20005", "积分余额不足");
-                    } catch (Exception e) {
-                        throw new ParameterErrorException();
-                    }
-                    return errorJson.toJson();
+                        throw new IntegrationErrorException();
                 }
             } catch (Exception e) {
-                logger.error("Error in removeUserIntegralByUserId relation", e);
-                // 程序异常返回http状态码500
-                ErrorJson errorJson = null;
-                try {
-                    errorJson = errorJson = new ErrorJson("22222", "未知异常");
-                } catch (Exception e1) {
-                    throw new ParameterErrorException();
-                }
-                return errorJson.toJson();
+                    throw new IntegrationErrorException();
+
             }
             return result.toJSONString();
         }
@@ -110,24 +94,12 @@ public class UserIntegralController {
         logger.info("Receive exchange register request with userId:" + userId + " actionType:" + actionType);
         if (userId == null || StringUtil.isNull(actionType)) {
             ErrorJson errorJson = null;
-            try {
-                errorJson = new ErrorJson("20004", "参数问题");
-            } catch (Exception e) {
                 throw new ParameterErrorException();
-            }
-
-            return errorJson;
         }
         Boolean res = userIntegralService.addIntegralByUserId(userId, actionType, extParams);
         if (!res) {
-            ErrorJson errorJson = null;
-            try {
-                errorJson = new ErrorJson("20002", "增加积分失败");
-            } catch (Exception e) {
-                throw new ParameterErrorException();
+                throw new IntegrationErrorException();
             }
-            return errorJson;
-        }
         response.setStatus(200);
         return "successful";
     }
@@ -144,24 +116,13 @@ public class UserIntegralController {
         JSONObject jsonObject = new JSONObject();
         if (StringUtil.isNull(type) || integral == null) {
             ErrorJson errorJson = null;
-            try {
-                errorJson = new ErrorJson("20004", "参数问题");
-            } catch (Exception e) {
                 throw new ParameterErrorException();
-            }
-            return errorJson.toJson();
         } else {
             Integer out = userIntegralService.updateIntegralByType(type, integral);
             if (out > 0) {
                 jsonObject.put("message", "修改成功");
             } else {
-                ErrorJson errorJson = null;
-                try {
-                    errorJson = new ErrorJson("20003", "设置积分规则失败");
-                } catch (Exception e) {
-                    throw new ParameterErrorException();
-                }
-                return errorJson.toJson();
+                    throw new IntegrationErrorException();
             }
         }
         response.setStatus(200);
@@ -209,8 +170,7 @@ public class UserIntegralController {
     @ResponseBody
     public String updateIntegral(@RequestParam Integer integralModification, HttpServletResponse response) throws Exception{
         if (integralModification.equals(null)) {
-            ErrorJson errorJson = new ErrorJson("20004", "参数问题");
-            return errorJson.toJson();
+            throw new IntegrationErrorException();
         }
         JSONObject jsonObject = new JSONObject();
         try {
@@ -219,14 +179,8 @@ public class UserIntegralController {
             jsonObject.put("message", "积分设置成功");
             jsonObject.put("code", "200");
         } catch (Exception e) {
-            logger.error("Error in update integral exchange value", e);
-            ErrorJson errorJson = null;
-            try {
-                errorJson = new ErrorJson("22222", "未知异常");
-            } catch (Exception e1) {
+                //未知异常
                 throw new ParameterErrorException();
-            }
-            return errorJson.toJson();
         }
         response.setStatus(200);
         return jsonObject.toJSONString();
@@ -247,14 +201,7 @@ public class UserIntegralController {
             jsonObject.put("message", "初始化设置成功");
             jsonObject.put("code", "200");
         } catch (Exception e) {
-            logger.error("Error in update select exchange value", e);
-            ErrorJson errorJson = null;
-            try {
-                errorJson = new ErrorJson("22222", "未知异常");
-            } catch (Exception e1) {
                 throw new ParameterErrorException();
-            }
-            return errorJson.toJson();
         }
         response.setStatus(200);
         return jsonObject.toJSONString();

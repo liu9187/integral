@@ -1,6 +1,7 @@
 package com.minxing.integral.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.minxing.integral.common.exception.IntegrationErrorException;
 import com.minxing.integral.common.exception.ParameterErrorException;
 import com.minxing.integral.common.exception.TokenBadException;
 import com.minxing.integral.common.exception.TokenDecryptException;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ExchangeExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(ExchangeExceptionHandler.class);
-
+    private static final Integer INTEGERAL_ERROR =20005;
     private static final Integer PARAMETER_ERROR = 20004;
     private static final Integer UNKNOWN_ERROR = 22222;
     private static final Integer TOKEN_BAD = 20000;
@@ -32,16 +33,28 @@ public class ExchangeExceptionHandler {
             // 参数错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             // 返回错误的数据
-            return generateErrorMsg("parameter error", PARAMETER_ERROR);
+            return generateErrorMsg("参数问题", PARAMETER_ERROR);
+        }else if (e instanceof IntegrationErrorException) {
+            // 参数错误,返回错误数据
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            // 返回错误的数据
+            return generateErrorMsg("积分问题", INTEGERAL_ERROR);
         }else if (e instanceof TokenBadException || e instanceof TokenDecryptException) {
             // 用户信息校验失败
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
             // 错误数据返回
             return generateErrorMsg("permission validation failed", TOKEN_BAD);
         }
+        if (e instanceof IntegrationErrorException) {
+            // 参数错误,返回错误数据
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            // 返回错误的数据
+            return generateErrorMsg("积分问题", INTEGERAL_ERROR);
+        }
+
         logger.error("Unknown abnormal",e);
         response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        return generateErrorMsg("Unknown abnormal", UNKNOWN_ERROR);
+        return generateErrorMsg("未知异常", UNKNOWN_ERROR);
     }
 
     /**
