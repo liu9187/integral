@@ -45,13 +45,6 @@ public class ExchangeExceptionHandler {
             // 错误数据返回
             return generateErrorMsg("permission validation failed", TOKEN_BAD);
         }
-        if (e instanceof IntegrationErrorException) {
-            // 参数错误,返回错误数据
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            // 返回错误的数据
-            return generateErrorMsg("积分问题", INTEGERAL_ERROR);
-        }
-
         logger.error("Unknown abnormal",e);
         response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         return generateErrorMsg("未知异常", UNKNOWN_ERROR);

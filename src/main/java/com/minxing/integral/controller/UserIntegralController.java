@@ -73,7 +73,7 @@ public class UserIntegralController {
                         throw new IntegrationErrorException();
                 }
             } catch (Exception e) {
-                    throw new IntegrationErrorException();
+                    logger.error("error controller  removeUserIntegralByUserId"+e);
 
             }
             return result.toJSONString();
@@ -93,7 +93,6 @@ public class UserIntegralController {
     public Object addIntegral(@RequestParam String userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) throws Exception {
         logger.info("Receive exchange register request with userId:" + userId + " actionType:" + actionType);
         if (userId == null || StringUtil.isNull(actionType)) {
-            ErrorJson errorJson = null;
                 throw new ParameterErrorException();
         }
         Boolean res = userIntegralService.addIntegralByUserId(userId, actionType, extParams);
@@ -180,7 +179,7 @@ public class UserIntegralController {
             jsonObject.put("code", "200");
         } catch (Exception e) {
                 //未知异常
-                throw new ParameterErrorException();
+                logger.error("error controller updateIntegral"+e);
         }
         response.setStatus(200);
         return jsonObject.toJSONString();
