@@ -1,11 +1,14 @@
 package com.minxing.integral.common.exception;
 
 /**
- * @author SuZZ on 2018/3/8.
+ * 积分错误
+ * @author liucl
+ * @date 2018-4-28
  */
 public class IntegrationErrorException extends Exception {
     public IntegrationErrorException(){
 
         super("integral error");
     }
+
 }

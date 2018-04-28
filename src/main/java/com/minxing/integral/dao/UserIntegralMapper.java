@@ -157,7 +157,7 @@ public interface UserIntegralMapper {
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
                     if (null !=timeStart){
-                        sql.append("and  ir.create_date>#{timeStart}");
+                        sql.append("and  ir.create_date>#{timeStart} ");
                     }
                     //判断结束时间是否为null
                     if (null !=timeEnd){
@@ -223,7 +223,7 @@ public interface UserIntegralMapper {
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
                     if (null !=timeStart){
-                        sql.append("and  ir.create_date>#{timeStart}");
+                        sql.append("and  ir.create_date>#{timeStart} ");
                     }
                     //判断结束时间是否为null
                     if (null !=timeEnd){
