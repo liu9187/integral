@@ -65,6 +65,7 @@ public class UserIntegralController {
                 int out = userIntegralService.removeUserIntegralByUserId(userIntegral);
                 if (out > 0) {
                     result.put("message", "兑换成功");
+                    result.put("out",out);
                 } else {
                     // 参数错误返回http状态码400
                     //积分余额不足

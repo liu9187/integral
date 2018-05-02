@@ -27,12 +27,19 @@ import java.util.List;
 public interface UserIntegralMapper {
 
     /**
-     * 积分兑换
+     * 积分兑换-更新积分
      * @param userIntegral
      * @return
      */
     @Update("UPDATE user_infos SET integral=integral-#{integral} WHERE user_id=#{userId} AND integral>#{integral}")
     Integer  removeUserIntegralByUserId(UserInfos userIntegral);
+
+    /**
+     * 积分兑换-返回积分信息
+     * @return
+     */
+    @Select("SELECT integral FROM user_infos  WHERE user_id=#{userId}")
+    Integer selectIntegralByUserId(@Param("userId") Integer userId);
 
     /**
      * 积分管理 升序
