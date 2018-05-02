@@ -20,4 +20,10 @@ public interface UserMapper {
             "LIMIT 1")
     Oauth2AccessToken findAccountByToken(@Param("token") String token);
 
+    @Select("SELECT\n" + "\tid\n" + "FROM\n" + "\tuser_network_adminnings\n" + "WHERE\n"
+            + "\tuser_id = (\n" + "\t\tSELECT\n" + "\t\t\tid\n" + "\t\tFROM\n" + "\t\t\tusers\n"
+            + "\t\tWHERE\n" + "\t\t\tnetwork_id = #{nd}\n" + "\t\tAND account_id = #{accountId}\n" + "\t)\n"
+            + "AND network_id = #{nd}")
+    Integer checkNetWorkAdmin(@Param("nd")String nd,@Param("accountId")Long accountId);
+
 }

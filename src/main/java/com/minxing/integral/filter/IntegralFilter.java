@@ -65,30 +65,41 @@ public class IntegralFilter implements Filter {
     public Integer findUserIdByRequestHeader(HttpServletRequest request) {
         try {
             String authorization = request.getHeader("AUTHORIZATION");
-            String networdId = request.getHeader("NETWORK-ID");
-            logger.info("authorization: " + authorization + " networdId: " + networdId);
-            if (StringUtils.isNotEmpty(networdId)) {
+            String networkId = request.getHeader("NETWORK-ID");
+            Cookie[] cookies = request.getCookies();
+            if (StringUtils.isEmpty(networkId)) {
+                if (cookies != null && cookies.length != 0) {
+                    for (Cookie cookie : cookies) {
+                        if ("mx_network_id".equals(cookie.getName())) {
+                            networkId = cookie.getValue();
+                            break;
+                        }
+                    }
+                }
+            }
+            logger.info("authorization: " + authorization + " networkId: " + networkId);
+            if (StringUtils.isNotEmpty(networkId)) {
+                logger.info("network-id: " + networkId);
                 Oauth2AccessToken oauth2AccessToken = null;
                 Long accountId = null;
                 if (StringUtils.isEmpty(authorization)) {
                     logger.info("StringUtils.isEmpty(authorization) is ture");
                     //尝试从session中获取accountId
                     String sessionId = null;
-                    Cookie[] cookies = request.getCookies();
-                    if (cookies != null && cookies.length != 0){
+                    if (cookies != null && cookies.length != 0) {
                         for (Cookie cookie : cookies) {
-                            if (cookie.getName().equals("_session_id")){
+                            if (cookie.getName().equals("_session_id")) {
                                 sessionId = cookie.getValue();
                             }
                         }
                     }
-                    if (StringUtils.isNotEmpty(sessionId)){
+                    if (StringUtils.isNotEmpty(sessionId)) {
                         accountId =
                                 CookieSession.unmarshalAccountIdFromCookie(URLDecoder.decode(sessionId.split("--")[0]));
                     }
                 } else {
                     oauth2AccessToken = userMapper.findAccountByToken(authorization.substring(7).trim());
-                    if (oauth2AccessToken == null){
+                    if (oauth2AccessToken == null) {
                         return null;
                     }
                     if (oauth2AccessToken.getExpiredTime().before(new Date())) {
@@ -101,8 +112,7 @@ public class IntegralFilter implements Filter {
                     }
                 }
                 logger.info("accountId: " + accountId);
-                Integer uid =
-                        userMapper.findUidByAccountIdAndNetWorkId(accountId, Integer.valueOf(networdId));
+                Integer uid = userMapper.checkNetWorkAdmin(networkId, accountId);
                 return uid;
             } else {
                 logger.error("The network-id is empty!");
