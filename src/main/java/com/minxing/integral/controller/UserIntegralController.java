@@ -1,6 +1,6 @@
 package com.minxing.integral.controller;
 
-import com.alibaba.fastjson.JSONArray;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -13,7 +13,6 @@ import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.service.UserIntegralService;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +48,11 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/removeUserIntegralByUserId", method = {RequestMethod.PUT})
     @ResponseBody
-    public String removeUserIntegralByUserId(@RequestParam Integer userId, @RequestParam Long integral, HttpServletResponse response) throws Exception {
+    public String removeUserIntegralByUserId(@RequestParam(name = "userId",required = false) Integer userId, @RequestParam(name = "integral",required = false) Long integral, HttpServletResponse response) throws Exception {
         JSONObject result = new JSONObject();
         // 接收到积分兑换请求
         logger.info("Receive integral exchange request with userId:" + userId + "  integral: " + integral);
         if (userId == null || integral == null) {
-            ErrorJson errorJson = null;
             // 参数错误返回http状态码400
                 throw new ParameterErrorException();
         } else {
@@ -67,14 +65,15 @@ public class UserIntegralController {
                 int out = userIntegralService.removeUserIntegralByUserId(userIntegral);
                 if (out > 0) {
                     result.put("message", "兑换成功");
+                    result.put("out",out);
                 } else {
-                    ErrorJson errorJson = null;
                     // 参数错误返回http状态码400
-                        throw new IntegrationErrorException();
+                    //积分余额不足
+                       throw new IntegrationErrorException();
                 }
             } catch (Exception e) {
-                    throw new IntegrationErrorException();
-
+                    logger.error("error controller  removeUserIntegralByUserId"+e);
+                      throw e;
             }
             return result.toJSONString();
         }
@@ -93,7 +92,6 @@ public class UserIntegralController {
     public Object addIntegral(@RequestParam String userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) throws Exception {
         logger.info("Receive exchange register request with userId:" + userId + " actionType:" + actionType);
         if (userId == null || StringUtil.isNull(actionType)) {
-            ErrorJson errorJson = null;
                 throw new ParameterErrorException();
         }
         Boolean res = userIntegralService.addIntegralByUserId(userId, actionType, extParams);
@@ -115,7 +113,6 @@ public class UserIntegralController {
     public String updateIntegralByType(@RequestParam String type, @RequestParam Integer integral, HttpServletResponse response) throws Exception {
         JSONObject jsonObject = new JSONObject();
         if (StringUtil.isNull(type) || integral == null) {
-            ErrorJson errorJson = null;
                 throw new ParameterErrorException();
         } else {
             Integer out = userIntegralService.updateIntegralByType(type, integral);
@@ -180,7 +177,8 @@ public class UserIntegralController {
             jsonObject.put("code", "200");
         } catch (Exception e) {
                 //未知异常
-                throw new ParameterErrorException();
+                logger.error("error controller updateIntegral"+e);
+                throw e;
         }
         response.setStatus(200);
         return jsonObject.toJSONString();
@@ -235,6 +233,7 @@ public class UserIntegralController {
         } catch (Exception e) {
             //调用service 方法的时候出现错误
             logger.error("error is controller ordinaryUser:" + e);
+            throw e;
         }
         response.setStatus(200);
         return jsonObject.toJSONString();

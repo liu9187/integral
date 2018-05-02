@@ -40,13 +40,18 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * 积分兑换
      *
      * @param userIntegral
-     * @return
+     * @return out
      */
     @Override
     @Transactional
     public Integer removeUserIntegralByUserId(UserInfos userIntegral) {
-
-        return userIntegralMapper.removeUserIntegralByUserId(userIntegral);
+        //更新积分
+       Integer out= userIntegralMapper.removeUserIntegralByUserId(userIntegral);
+            if (out>0){
+                //反馈剩余积分信息
+            out=userIntegralMapper.selectIntegralByUserId(userIntegral.getUserId());
+            }
+        return out;
     }
 
     /**
