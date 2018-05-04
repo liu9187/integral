@@ -38,8 +38,8 @@ set -e
 iden=mx_integral
 identity="-Didentity=$iden"
 
-# ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
-ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*:$server_thirdpartylib/*:" com.minxing.integral.StartUp"
+ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
+# ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*:$server_thirdpartylib/*:" com.minxing.integral.StartUp"
 
 case "$1" in
   start)
@@ -82,5 +82,3 @@ case "$1" in
         exit 1
         ;;
 esac
-
-exit 0
