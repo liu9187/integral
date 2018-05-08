@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.minxing.integral.common.bean.Oauth2AccessToken;
 import com.minxing.integral.common.util.ErrorJson;
+import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.dao.UserMapper;
 import com.minxing.token.CookieSession;
 import org.apache.commons.lang.StringUtils;
@@ -78,6 +79,10 @@ public class IntegralFilter implements Filter {
                 }
             }
             logger.info("authorization: " + authorization + " networkId: " + networkId);
+            // FIXME network id 取不到,临时解决方案
+            if (StringUtils.isEmpty(networkId)){
+                networkId = "2";
+            }
             if (StringUtils.isNotEmpty(networkId)) {
                 logger.info("network-id: " + networkId);
                 Oauth2AccessToken oauth2AccessToken = null;
