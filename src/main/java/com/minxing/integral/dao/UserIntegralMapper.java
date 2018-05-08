@@ -45,19 +45,18 @@ public interface UserIntegralMapper {
      * 积分管理 升序
      * @return IntegralManagementVO
      */
-    @Select("SELECT u.id,u.`name`,ui.integral,dept.short_name FROM users u " +
-            "LEFT JOIN  user_infos ui ON ui.user_id=u.id " +
-            "LEFT JOIN  departments dept  ON dept.id=u.dept_id " +
-            "ORDER BY ui.integral ")
+    @Select("SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,dept.short_name AS shortName FROM users u  \n" +
+            " LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" +
+            " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
+            " ORDER BY ui.integral ")
    List<IntegralManagementVO>  queryListByASC();
     /**
      * 积分管理 降序
      * @return IntegralManagementVO
      */
-    @Select("SELECT u.id,u.`name`,ui.integral,dept.short_name FROM users u " +
-            "LEFT JOIN  user_infos ui ON ui.user_id=u.id " +
-            "LEFT JOIN  departments dept  ON dept.id=u.dept_id " +
-            "ORDER BY ui.integral DESC")
+    @Select("SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,dept.short_name AS shortName FROM users u  \n" +
+            "LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" + "LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
+            "ORDER BY ui.integral  DESC")
     List<IntegralManagementVO> queryListByDESC();
 
     /**

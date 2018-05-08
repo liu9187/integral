@@ -73,9 +73,11 @@ public class InitListener {
         //尝试创建integral_exchange表
         try {
             initMapper.findIntegralExchange();
+
         }catch (Exception e){
             logger.info("Table integral_exchange not exist, Start to create table");
             initMapper.initIntegralExchange();
+            initMapper.initAddIntegralExchange();
         }
 
         //尝试创建valid_event表（有效事件表）

@@ -69,4 +69,7 @@ public interface InitMapper {
             "  PRIMARY KEY (`id`)\n" +
             ")")
     void initValidEvent();
+
+    @Insert("INSERT INTO integral_exchange(id,integral_exchange,create_date) VALUES (1,200,NOW())")
+    void initAddIntegralExchange();
 }
