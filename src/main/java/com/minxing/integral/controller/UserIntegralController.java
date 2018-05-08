@@ -174,7 +174,7 @@ public class UserIntegralController {
     @RequestMapping(value = "/updateIntegral", method = {RequestMethod.PUT})
     @ResponseBody
     public String updateIntegral(@RequestParam Integer integralModification, HttpServletResponse response) throws Exception {
-        if (integralModification.equals( null )) {
+        if (null==integralModification){
             throw new IntegrationErrorException();
         }
         JSONObject jsonObject = new JSONObject();
