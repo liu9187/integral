@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -135,14 +136,20 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/queryList", method = {RequestMethod.GET})
     @ResponseBody
-    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "10", name = "pageSize") Integer pageSize,
-                            @RequestParam(defaultValue = "1", name = "order") Integer order, @RequestParam(defaultValue = "integral") String type, HttpServletResponse response) {
+    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "20", name = "pageSize") Integer pageSize,
+                            @RequestParam(defaultValue = "1", name = "order") Integer order, @RequestParam(defaultValue = "integral") String type, HttpServletResponse response, HttpServletRequest request) {
         if (null == order) {
             ErrorJson errorJson = new ErrorJson("20004", "参数问题");
             return errorJson.toJson();
         }
+        //获取 networkId
+        String networkId = (String) request.getAttribute( "networkId" );
+          //测试使用
+
+           //  networkId="3";
+
         PageHelper.startPage(pageNum, pageSize);
-        List<IntegralManagementVO> vos = userIntegralService.queryList(order);
+        List<IntegralManagementVO> vos = userIntegralService.queryList(order,networkId);
         PageInfo<IntegralManagementVO> pageInfo = new PageInfo<>(vos);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("vos", vos);
@@ -219,11 +226,17 @@ public class UserIntegralController {
     @RequestMapping(value = "/ordinaryUser", method = {RequestMethod.GET})
     @ResponseBody
     public String ordinaryUser(@RequestParam(defaultValue = "count") String type, @RequestParam(defaultValue = "1") Integer order
-            , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize,HttpServletResponse response) throws Exception {
+            , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize,HttpServletResponse response,HttpServletRequest request) throws Exception {
         logger.info("ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize);
         JSONObject jsonObject = new JSONObject();
+        //获取 networkId
+        String networkId = (String) request.getAttribute( "networkId" );
+        //测试使用
+//        if (networkId.equals(null) ){
+//            networkId="3";
+//        }
         try {
-            List<OrdinaryUserVO> vos = userIntegralService.ordinaryUser(type, order, timeStart, timeEnd, pageNum, pageSize);
+            List<OrdinaryUserVO> vos = userIntegralService.ordinaryUser(type, order, timeStart, timeEnd, pageNum, pageSize,networkId);
             PageInfo<OrdinaryUserVO> page = new PageInfo(vos);
             //把分页信息和查询结果加入到json对象当中
             jsonObject.put("code", 200);
@@ -253,11 +266,17 @@ public class UserIntegralController {
     @RequestMapping(value = "/specialUser", method = {RequestMethod.GET})
     @ResponseBody
     public String specialUser(@RequestParam(defaultValue = "count2") String type, @RequestParam(defaultValue = "1") Integer order
-            , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize,HttpServletResponse response)throws Exception {
+            , @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize,HttpServletResponse response,HttpServletRequest request)throws Exception {
         logger.info("ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize);
         JSONObject jsonObject = new JSONObject();
+        //获取 networkId
+        String networkId = (String) request.getAttribute( "networkId" );
+        //测试使用
+//        if (networkId.equals(null) ){
+//            networkId="3";
+//        }
         try {
-            List<SpecialUserVO> vos = userIntegralService.specialUser(type, order, timeStart, timeEnd, pageNum, pageSize);
+            List<SpecialUserVO> vos = userIntegralService.specialUser(type, order, timeStart, timeEnd, pageNum, pageSize,networkId);
             PageInfo<OrdinaryUserVO> page = new PageInfo(vos);
             //把数据封装到json对象当中
             jsonObject.put("code", 200);

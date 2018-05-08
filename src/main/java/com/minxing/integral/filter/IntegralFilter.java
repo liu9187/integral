@@ -83,6 +83,8 @@ public class IntegralFilter implements Filter {
             if (StringUtils.isEmpty(networkId)){
                 networkId = "2";
             }
+            //把 networkId 存到 Attribute
+            request.setAttribute("networkId ",networkId );
             if (StringUtils.isNotEmpty(networkId)) {
                 logger.info("network-id: " + networkId);
                 Oauth2AccessToken oauth2AccessToken = null;

@@ -48,16 +48,18 @@ public interface UserIntegralMapper {
     @Select("SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,dept.short_name AS shortName FROM users u  \n" +
             " LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" +
             " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
+            " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} "+
             " ORDER BY ui.integral ")
-   List<IntegralManagementVO>  queryListByASC();
+   List<IntegralManagementVO>  queryListByASC(@Param("networkId") String networkId );
     /**
      * 积分管理 降序
      * @return IntegralManagementVO
      */
     @Select("SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,dept.short_name AS shortName FROM users u  \n" +
             "LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" + "LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
+            " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} "+
             "ORDER BY ui.integral  DESC")
-    List<IntegralManagementVO> queryListByDESC();
+    List<IntegralManagementVO> queryListByDESC(@Param("networkId") String networkId );
 
     /**
      * 积分设置
@@ -135,7 +137,7 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
- List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd);
+ List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId);
     /**
      * 特殊用户
      * @param type 类型  阅读 read  评论 comment 合计 count
@@ -145,11 +147,11 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "SpecialUser")
-    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd);
+    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId);
 
     class IntegralSqlBuilder{
         Logger logger = LoggerFactory.getLogger(IntegralSqlBuilder.class);
-        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
+        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -158,7 +160,7 @@ public interface UserIntegralMapper {
                         "       IF(SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0) AS count   " +
                         "    FROM  users u  " +
                         "    LEFT JOIN integral_record ir ON ir.user_id=u.id  " +
-                        "    WHERE   u.id not IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
+                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id not IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
@@ -213,7 +215,7 @@ public interface UserIntegralMapper {
          * @param timeEnd
          * @return
          */
-        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd){
+        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -224,7 +226,7 @@ public interface UserIntegralMapper {
                         "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)+IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0) AS count2 " +
                         "    FROM  users u  " +
                         "    LEFT JOIN integral_record ir ON ir.user_id=u.id " +
-                        "    WHERE   u.id IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
+                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null

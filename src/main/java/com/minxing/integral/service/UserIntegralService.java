@@ -27,7 +27,7 @@ public interface UserIntegralService {
      * @param order 排序 0 降序  1升序
      * @return
      */
-    List<IntegralManagementVO> queryList(Integer order);
+    List<IntegralManagementVO> queryList(Integer order,String networkId);
 
     /**
      * 积分设置
@@ -67,7 +67,7 @@ public interface UserIntegralService {
      * @param pageSize 当前页记录数量
      * @return
      */
-    List<OrdinaryUserVO>  ordinaryUser(String type,  Integer order ,  Long timeStart,  Long timeEnd,Integer pageNum,Integer pageSize);
+    List<OrdinaryUserVO>  ordinaryUser(String type,  Integer order ,  Long timeStart,  Long timeEnd,Integer pageNum,Integer pageSize,String networkId);
 
     /**
      * 特殊用户
@@ -79,7 +79,7 @@ public interface UserIntegralService {
      * @param  pageSize 当前页记录数量
      * @return
      */
-    List<SpecialUserVO>  specialUser( String type, Integer order , Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize);
+    List<SpecialUserVO>  specialUser( String type, Integer order , Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId);
 
     /**
      * 设置特殊处理类

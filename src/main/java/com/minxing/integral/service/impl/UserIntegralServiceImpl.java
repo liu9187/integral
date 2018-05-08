@@ -8,7 +8,6 @@ import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
-import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.IntegralService;
 import com.minxing.integral.service.UserIntegralService;
@@ -61,14 +60,14 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<IntegralManagementVO> queryList(Integer order) {
+    public List<IntegralManagementVO> queryList(Integer order,String networkId) {
         List<IntegralManagementVO> list=new ArrayList<>();
         try {
             if (order==1) {
-                list = userIntegralMapper.queryListByASC();
+                list = userIntegralMapper.queryListByASC(networkId);
             } else {
                 // 默认降序
-                list = userIntegralMapper.queryListByDESC();
+                list = userIntegralMapper.queryListByDESC(networkId);
             }
         } catch (Exception e) {
             logger.error("The error is queryList" + e);
@@ -178,10 +177,10 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize) {
+    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId) {
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd);
+        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd,networkId);
     }
 
     /**
@@ -195,10 +194,10 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize) {
+    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId) {
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd);
+        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd,networkId);
     }
 
     /**
