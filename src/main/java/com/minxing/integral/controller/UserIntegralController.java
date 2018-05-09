@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.exception.IntegrationErrorException;
 import com.minxing.integral.common.exception.ParameterErrorException;
+import com.minxing.integral.common.exception.PointsExchangeException;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
@@ -69,7 +70,7 @@ public class UserIntegralController {
                 } else {
                     // 参数错误返回http状态码400
                     //积分余额不足
-                    throw new IntegrationErrorException();
+                    throw new PointsExchangeException();
                 }
             } catch (Exception e) {
                 logger.error( "error controller  removeUserIntegralByUserId" + e );

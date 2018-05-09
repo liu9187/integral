@@ -1,10 +1,7 @@
 package com.minxing.integral.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import com.minxing.integral.common.exception.IntegrationErrorException;
-import com.minxing.integral.common.exception.ParameterErrorException;
-import com.minxing.integral.common.exception.TokenBadException;
-import com.minxing.integral.common.exception.TokenDecryptException;
+import com.minxing.integral.common.exception.*;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ExchangeExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(ExchangeExceptionHandler.class);
+    private static final Integer Points_Exchange_ERROR =20006;
     private static final Integer INTEGRAL_ERROR =20005;
     private static final Integer PARAMETER_ERROR = 20004;
     private static final Integer UNKNOWN_ERROR = 22222;
@@ -35,7 +33,7 @@ public class ExchangeExceptionHandler {
             // 返回错误的数据
             return generateErrorMsg("参数问题", PARAMETER_ERROR);
         }else if (e instanceof IntegrationErrorException) {
-            // 参数错误,返回错误数据
+            // 积分设置错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             // 返回错误的数据
             return generateErrorMsg("设置失败请重试", INTEGRAL_ERROR);
@@ -44,6 +42,11 @@ public class ExchangeExceptionHandler {
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
             // 错误数据返回
             return generateErrorMsg("permission validation failed", TOKEN_BAD);
+        }else if (e instanceof PointsExchangeException){
+            // 积分兑换错误,返回错误数据
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            // 返回错误的数据
+            return generateErrorMsg("积分余额不足无法兑换", Points_Exchange_ERROR);
         }
         logger.error("Unknown abnormal",e);
         response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
