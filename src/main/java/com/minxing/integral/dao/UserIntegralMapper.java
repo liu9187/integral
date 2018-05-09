@@ -9,6 +9,7 @@ import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.common.util.ServletUtil;
 import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.controller.UserIntegralController;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public interface UserIntegralMapper {
      * @param userIntegral
      * @return
      */
-    @Update("UPDATE user_infos SET integral=integral-#{integral} WHERE user_id=#{userId} AND integral>#{integral}")
+    @Update("UPDATE user_infos SET integral=integral-#{integral} WHERE user_id=#{userId} AND integral>=#{integral}")
     Integer  removeUserIntegralByUserId(UserInfos userIntegral);
 
     /**
@@ -50,7 +51,7 @@ public interface UserIntegralMapper {
             " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
             " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} "+
             " ORDER BY ui.integral ")
-   List<IntegralManagementVO>  queryListByASC(@Param("networkId") String networkId );
+   List<IntegralManagementVO>  queryListByASC(@Param("networkId") String networkId,@Param("name") String name );
     /**
      * 积分管理 降序
      * @return IntegralManagementVO
@@ -59,15 +60,15 @@ public interface UserIntegralMapper {
             "LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" + "LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
             " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} "+
             "ORDER BY ui.integral  DESC")
-    List<IntegralManagementVO> queryListByDESC(@Param("networkId") String networkId );
+    List<IntegralManagementVO> queryListByDESC(@Param("networkId") String networkId ,@Param("name") String name );
 
     /**
      * 积分设置
      * @param integralExchange
      * @return
      */
-    @Update("update integral_exchange SET integral_exchange=#{integral_exchange},create_date=NOW() WHERE id=1")
-    Integer updateIntegral(Integer integralExchange);
+    @Update("update integral_exchange SET integral_exchange=#{integralExchange},create_date=NOW() WHERE id=1")
+    Integer updateIntegral(@Param("integralExchange") Long integralExchange);
 
     /**
      * 通过userid增加积分
@@ -137,7 +138,16 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
- List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId);
+ List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
+
+    /**
+     * 积分管理页面
+     * @param networkId
+     * @param name
+     * @return
+     */
+    @SelectProvider(type =IntegralSqlBuilder.class,method = "queryList")
+    List<IntegralManagementVO> queryList(@Param("networkId") String networkId ,@Param("name") String name , @Param("order") Integer order);
     /**
      * 特殊用户
      * @param type 类型  阅读 read  评论 comment 合计 count
@@ -147,11 +157,23 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "SpecialUser")
-    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId);
+    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
 
     class IntegralSqlBuilder{
         Logger logger = LoggerFactory.getLogger(IntegralSqlBuilder.class);
-        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ){
+
+        /**
+         * 普通用户
+         * @param groupId
+         * @param type
+         * @param order
+         * @param timeStart
+         * @param timeEnd
+         * @param networkId
+         * @param name
+         * @return
+         */
+        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ,@Param("name") final String name){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -171,28 +193,32 @@ public interface UserIntegralMapper {
                     if (null !=timeEnd){
                         sql.append("AND ir.create_date<#{timeEnd} ");
                     }
+                    //判断name是否为null
+                    if (StringUtils.isNotEmpty(name)){
+                        sql.append(" AND (u.`name` LIKE #{name} OR u.pinyin LIKE #{name}  OR u.initialism LIKE #{name} ) ");
+                    }
                      //根据阅读次数排序
                     if (type.equals("read")){
                         if (order==1){
-                            sql.append("GROUP BY u.id   ORDER BY SUM(ir.integral_id=1) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id   ORDER BY ifnull(SUM(ir.integral_id = 1),0) ASC ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id  ORDER BY ifnull(SUM(ir.integral_id = 1),0)   DESC ,u.pinyin ASC");
                         }
                     }
                     //根据评论次数排序
                     if (type.equals("comment")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0) ASC ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据合计数排序
                     if (type.equals("count")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)  ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 1),0)+ifnull(SUM(ir.integral_id = 2),0)  ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 1),0)+ifnull(SUM(ir.integral_id = 2),0) DESC ,u.pinyin ASC");
                         }
                     }
                 }
@@ -215,7 +241,7 @@ public interface UserIntegralMapper {
          * @param timeEnd
          * @return
          */
-        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ){
+        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId,@Param("name") final String name ){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -237,45 +263,49 @@ public interface UserIntegralMapper {
                     if (null !=timeEnd){
                         sql.append("AND ir.create_date<#{timeEnd} ");
                     }
+                    //判断是否有name
+                    if (StringUtils.isNotEmpty(name)){
+                        sql.append(" AND (u.`name` LIKE #{name} OR u.pinyin LIKE #{name}  OR u.initialism LIKE #{name} ) ");
+                    }
                     //根据阅读次数排序
                     if (type.equals("read")){
                         if (order==1){
-                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=1) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id  ORDER BY ifnull(SUM(ir.integral_id = 1),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0) DESC ,u.pinyin ASC");
                         }
                     }
 
                     //根据评论次数排序
                     if (type.equals("comment")){
                         if (order==1){
-                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=2) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id  ORDER BY ifnull(SUM(ir.integral_id = 2),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据转发次数排序
                     if (type.equals("forward")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 3),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 3),0) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据评论+转发数排序
                     if (type.equals("count1")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0)+ifnull(SUM(ir.integral_id = 3),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0)+ifnull(SUM(ir.integral_id = 3),0) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据总合计数排序
                     if (type.equals("count2")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 1),0)+ifnull(SUM(ir.integral_id = 2),0)+ifnull(SUM(ir.integral_id = 3),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 1),0)+ifnull(SUM(ir.integral_id = 2),0)+ifnull(SUM(ir.integral_id = 3),0) DESC ,u.pinyin ASC");
                         }
                     }
                 }
@@ -285,6 +315,39 @@ public interface UserIntegralMapper {
             }
             logger.info("查询sql=="+sql.toString());
             //System.out.println("查询sql=="+sql.toString());
+            return sql.toString();
+        }
+
+        /**
+         * 积分管理页面
+         * @param networkId
+         * @param name
+         * @return
+         */
+        public String queryList(@Param("networkId") final String networkId,@Param("name") final String name , @Param("order") final  Integer order){
+            StringBuffer sql =new StringBuffer();
+            try{
+              sql.append( "SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,dept.short_name AS shortName FROM users u  \n" +
+                      " LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" +
+                      " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" +
+                      " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} "
+                      );
+                //判断是否有name
+                if (StringUtils.isNotEmpty(name)){
+                    sql.append(" AND (u.`name` LIKE #{name} OR u.pinyin LIKE #{name}  OR u.initialism LIKE #{name} ) ");
+                }
+                  //判断是升序还是降序
+                if (order==1){
+                    sql.append(" ORDER BY ui.integral ");
+                }
+                else if (order==0){
+                    sql.append(" ORDER BY ui.integral DESC ");
+                }
+            }catch (Exception e){
+                //积分管理升序用户sql出现错误日志
+                logger.error("error is mapper queryListByASC:"+e);
+            }
+            logger.info("查询sql=="+sql.toString());
             return sql.toString();
         }
     }

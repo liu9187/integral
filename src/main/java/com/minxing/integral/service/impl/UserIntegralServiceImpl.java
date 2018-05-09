@@ -11,6 +11,7 @@ import com.minxing.integral.common.pojo.vo.SpecialUserVO;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.IntegralService;
 import com.minxing.integral.service.UserIntegralService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,15 +61,22 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<IntegralManagementVO> queryList(Integer order,String networkId) {
+    public List<IntegralManagementVO> queryList(String networkId,String nameStr,Integer order) {
         List<IntegralManagementVO> list=new ArrayList<>();
         try {
-            if (order==1) {
-                list = userIntegralMapper.queryListByASC(networkId);
-            } else {
-                // 默认降序
-                list = userIntegralMapper.queryListByDESC(networkId);
+//            if (order==1) {
+//                list = userIntegralMapper.queryListByASC(networkId);
+//            } else {
+//                // 默认降序
+//                list = userIntegralMapper.queryListByDESC(networkId);
+//            }
+            String name=null;
+            if (StringUtils.isNotEmpty( nameStr )){
+                name="%"+nameStr+"%";
             }
+            logger.info( "name:" +name);
+            list=userIntegralMapper.queryList(networkId,name,order);
+
         } catch (Exception e) {
             logger.error("The error is queryList" + e);
         }
@@ -82,7 +90,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      */
     @Override
     @Transactional
-    public Integer updateIntegral(Integer integralModification) {
+    public Integer updateIntegral(Long integralModification) {
         return userIntegralMapper.updateIntegral(integralModification);
     }
 
@@ -177,10 +185,15 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId) {
+    public List<OrdinaryUserVO> ordinaryUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId,String nameStr) {
+        String name=null;
+        if (StringUtils.isNotEmpty( nameStr )){
+            name="%"+nameStr+"%";
+        }
+        logger.info( "name:" +name);
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd,networkId);
+        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd,networkId,name);
     }
 
     /**
@@ -194,10 +207,15 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId) {
+    public List<SpecialUserVO> specialUser(String type, Integer order, Long timeStart, Long timeEnd,Integer pageNum,Integer pageSize,String networkId,String nameStr) {
+         String name=null;
+       if (StringUtils.isNotEmpty( nameStr )){
+            name="%"+nameStr+"%";
+       }
+        logger.info( "name:" +name);
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd,networkId);
+        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd,networkId,name);
     }
 
     /**

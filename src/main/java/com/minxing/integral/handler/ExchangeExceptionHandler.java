@@ -18,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ExchangeExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(ExchangeExceptionHandler.class);
-    private static final Integer Points_Exchange_ERROR =20006;
+    private static final Integer DATE_ERROR =20007;
+    private static final Integer POINTS_EXCHANGE_ERROR =20006;
     private static final Integer INTEGRAL_ERROR =20005;
     private static final Integer PARAMETER_ERROR = 20004;
     private static final Integer UNKNOWN_ERROR = 22222;
@@ -46,7 +47,12 @@ public class ExchangeExceptionHandler {
             // 积分兑换错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             // 返回错误的数据
-            return generateErrorMsg("积分余额不足无法兑换", Points_Exchange_ERROR);
+            return generateErrorMsg("积分余额不足无法兑换", POINTS_EXCHANGE_ERROR);
+        }else if (e instanceof DateErrorException){
+            // 积分兑换错误,返回错误数据
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            // 返回错误的数据
+            return generateErrorMsg("结束时间大于开始时间", DATE_ERROR);
         }
         logger.error("Unknown abnormal",e);
         response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);

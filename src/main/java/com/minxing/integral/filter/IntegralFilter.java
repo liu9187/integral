@@ -72,10 +72,10 @@ public class IntegralFilter implements Filter {
                 }
             }
             logger.info("authorization: " + authorization + " networkId: " + networkId);
-            // FIXME network id 取不到,临时解决方案
-            if (StringUtils.isEmpty(networkId)){
-                networkId = "2";
-            }
+//            // FIXME network id 取不到,临时解决方案
+//            if (StringUtils.isEmpty(networkId)){
+//                networkId = "3";
+//            }
             //把 networkId 存到 对象
 //            Network network=new Network();
 //                  network.setNetworkId(networkId);
