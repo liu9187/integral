@@ -38,7 +38,7 @@ public class ExchangeExceptionHandler {
             // 参数错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             // 返回错误的数据
-            return generateErrorMsg("积分操作失败", INTEGRAL_ERROR);
+            return generateErrorMsg("设置失败请重试", INTEGRAL_ERROR);
         }else if (e instanceof TokenBadException || e instanceof TokenDecryptException) {
             // 用户信息校验失败
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);

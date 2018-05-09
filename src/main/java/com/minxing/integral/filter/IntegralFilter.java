@@ -1,21 +1,14 @@
 package com.minxing.integral.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.minxing.integral.common.bean.Oauth2AccessToken;
 import com.minxing.integral.common.util.ErrorJson;
-import com.minxing.integral.common.util.StringUtil;
 import com.minxing.integral.dao.UserMapper;
 import com.minxing.token.CookieSession;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
@@ -83,8 +76,10 @@ public class IntegralFilter implements Filter {
             if (StringUtils.isEmpty(networkId)){
                 networkId = "2";
             }
-            //把 networkId 存到 Attribute
-            request.setAttribute("networkId ",networkId );
+            //把 networkId 存到 对象
+//            Network network=new Network();
+//                  network.setNetworkId(networkId);
+               request.getSession().setAttribute( "networkId" ,networkId);
             if (StringUtils.isNotEmpty(networkId)) {
                 logger.info("network-id: " + networkId);
                 Oauth2AccessToken oauth2AccessToken = null;
