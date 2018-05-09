@@ -174,25 +174,25 @@ public interface UserIntegralMapper {
                      //根据阅读次数排序
                     if (type.equals("read")){
                         if (order==1){
-                            sql.append("GROUP BY u.id   ORDER BY SUM(ir.integral_id=1)");
+                            sql.append("GROUP BY u.id   ORDER BY SUM(ir.integral_id=1) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据评论次数排序
                     if (type.equals("comment")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据合计数排序
                     if (type.equals("count")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)  ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
                         }
                     }
                 }
@@ -240,42 +240,42 @@ public interface UserIntegralMapper {
                     //根据阅读次数排序
                     if (type.equals("read")){
                         if (order==1){
-                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=1)");
+                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=1) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1) DESC ,u.pinyin ASC");
                         }
                     }
 
                     //根据评论次数排序
                     if (type.equals("comment")){
                         if (order==1){
-                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=2)");
+                            sql.append("GROUP BY u.id  ORDER BY SUM(ir.integral_id=2) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据转发次数排序
                     if (type.equals("forward")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3)");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据评论+转发数排序
                     if (type.equals("count1")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3)");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
                         }
                     }
                     //根据总合计数排序
                     if (type.equals("count2")){
                         if (order==1){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3)");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC");
+                            sql.append("GROUP BY u.id ORDER BY SUM(ir.integral_id=1)+SUM(ir.integral_id=2)+SUM(ir.integral_id=3) DESC ,u.pinyin ASC");
                         }
                     }
                 }

@@ -136,7 +136,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/queryList", method = {RequestMethod.GET})
     @ResponseBody
-    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "20", name = "pageSize") Integer pageSize, @RequestParam(defaultValue = "1", name = "order") Integer order, @RequestParam(defaultValue = "integral") String type, HttpServletResponse response, HttpServletRequest request) {
+    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "20", name = "pageSize") Integer pageSize, @RequestParam(defaultValue = "0", name = "order") Integer order, @RequestParam(defaultValue = "integral") String type, HttpServletResponse response, HttpServletRequest request) {
         if (null == order) {
             ErrorJson errorJson = new ErrorJson( "20004", "参数问题" );
             return errorJson.toJson();
