@@ -272,7 +272,7 @@ public interface UserIntegralMapper {
                         if (order==1){
                             sql.append("GROUP BY u.id  ORDER BY ifnull(SUM(ir.integral_id = 1),0) ,u.pinyin ASC");
                         }else if(order==0){
-                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 2),0) DESC ,u.pinyin ASC");
+                            sql.append("GROUP BY u.id ORDER BY ifnull(SUM(ir.integral_id = 1),0) DESC ,u.pinyin ASC");
                         }
                     }
 
