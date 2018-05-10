@@ -338,10 +338,10 @@ public interface UserIntegralMapper {
                 }
                   //判断是升序还是降序
                 if (order==1){
-                    sql.append(" ORDER BY ui.integral ");
+                    sql.append(" ORDER BY ui.integral ,u.pinyin ASC");
                 }
                 else if (order==0){
-                    sql.append(" ORDER BY ui.integral DESC ");
+                    sql.append(" ORDER BY ui.integral DESC ,u.pinyin ASC");
                 }
             }catch (Exception e){
                 //积分管理升序用户sql出现错误日志
