@@ -34,8 +34,8 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     @Value("${event_type_is_valid}")
     private String isValidEvent;
     //特殊用户群组id
-    @Value("${user.group.id}")
-    private Integer groupId;
+    @Value("${role.item.id}")
+    private Integer itemId;
     /**
      * 积分兑换
      *
@@ -193,7 +193,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         logger.info( "name:" +name);
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.ordinaryUser(groupId,type,order,timeStart,timeEnd,networkId,name);
+        return userIntegralMapper.ordinaryUser(itemId,type,order,timeStart,timeEnd,networkId,name);
     }
 
     /**
@@ -215,7 +215,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         logger.info( "name:" +name);
         //分页插件
         PageHelper.startPage(pageNum, pageSize);
-        return userIntegralMapper.SpecialUser(groupId, type,order,timeStart,timeEnd,networkId,name);
+        return userIntegralMapper.SpecialUser(itemId, type,order,timeStart,timeEnd,networkId,name);
     }
 
     /**

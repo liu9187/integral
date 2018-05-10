@@ -138,7 +138,7 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "ordinaryUser")
- List<OrdinaryUserVO>  ordinaryUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
+ List<OrdinaryUserVO>  ordinaryUser(@Param("itemId") Integer itemId,@Param("type")String type, @Param("order") Integer order ,@Param("timeStart") Long timeStart,@Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
 
     /**
      * 积分管理页面
@@ -157,14 +157,14 @@ public interface UserIntegralMapper {
      * @return
      */
  @SelectProvider(type =IntegralSqlBuilder.class,method = "SpecialUser")
-    List<SpecialUserVO>  SpecialUser(@Param("groupId") Integer groupId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
+    List<SpecialUserVO>  SpecialUser(@Param("itemId") Integer itemId,@Param("type")String type, @Param("order") Integer order , @Param("timeStart") Long timeStart, @Param("timeEnd") Long timeEnd,@Param("networkId")  String networkId,@Param("name") String name);
 
     class IntegralSqlBuilder{
         Logger logger = LoggerFactory.getLogger(IntegralSqlBuilder.class);
 
         /**
          * 普通用户
-         * @param groupId
+         * @param itemId
          * @param type
          * @param order
          * @param timeStart
@@ -173,7 +173,7 @@ public interface UserIntegralMapper {
          * @param name
          * @return
          */
-        public String ordinaryUser(@Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ,@Param("name") final String name){
+        public String ordinaryUser(@Param("itemId") final Integer itemId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId ,@Param("name") final String name){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -182,7 +182,7 @@ public interface UserIntegralMapper {
                         "       IF(SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0) AS count   " +
                         "    FROM  users u  " +
                         "    LEFT JOIN integral_record ir ON ir.user_id=u.id  " +
-                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id not IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
+                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id not IN(SELECT user_id FROM  roles WHERE role_item_id=#{itemId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
@@ -241,7 +241,7 @@ public interface UserIntegralMapper {
          * @param timeEnd
          * @return
          */
-        public String SpecialUser( @Param("groupId") final Integer groupId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId,@Param("name") final String name ){
+        public String SpecialUser( @Param("itemId") final Integer itemId,@Param("type") final  String type, @Param("order") final  Integer order,@Param("timeStart") final Long timeStart,@Param("timeEnd") final Long timeEnd,@Param("networkId") final String networkId,@Param("name") final String name ){
             StringBuffer sql =new StringBuffer();
             try {
                 sql.append("SELECT u.`name`, " +
@@ -252,7 +252,7 @@ public interface UserIntegralMapper {
                         "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)+IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0) AS count2 " +
                         "    FROM  users u  " +
                         "    LEFT JOIN integral_record ir ON ir.user_id=u.id " +
-                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id IN(select user_group_members.member_id  from user_group_members where user_group_id =#{groupId}) " );
+                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id IN(SELECT user_id FROM  roles WHERE role_item_id==#{groupId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
