@@ -65,10 +65,16 @@ public class UserIntegralController {
                 userIntegral.setUserId( userId );
                 // 尝试进行积分兑换
                 int out = userIntegralService.removeUserIntegralByUserId( userIntegral );
+                  //兑换积分以后积分剩余大于零的情况
                 if (out > 0) {
                     result.put( "message", "兑换成功" );
                     result.put( "out", out );
-                } else {
+                    //兑换积分以后正好等于0的情况
+                }else if(out==0){
+                    result.put( "message", "兑换成功" );
+                    result.put( "out", out );
+                }
+                else {
                     // 参数错误返回http状态码400
                     //积分余额不足
                     throw new PointsExchangeException();
