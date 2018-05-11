@@ -69,8 +69,7 @@ public class UserIntegralController {
                 if (out > 0) {
                     result.put( "message", "兑换成功" );
                     result.put( "out", out );
-                    //兑换积分以后正好等于0的情况
-                }else if(out==0){
+                }else if (out==0){
                     result.put( "message", "兑换成功" );
                     result.put( "out", out );
                 }

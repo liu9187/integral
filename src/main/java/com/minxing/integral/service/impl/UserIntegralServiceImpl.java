@@ -46,12 +46,13 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     @Transactional
     public Integer removeUserIntegralByUserId(UserInfos userIntegral) {
         //更新积分
-       Integer out= userIntegralMapper.removeUserIntegralByUserId(userIntegral);
+         Integer integral=-1;
+        Integer out= userIntegralMapper.removeUserIntegralByUserId(userIntegral);
             if (out>0){
                 //反馈剩余积分信息
-            out=userIntegralMapper.selectIntegralByUserId(userIntegral.getUserId());
+            integral=userIntegralMapper.selectIntegralByUserId(userIntegral.getUserId());
             }
-        return out;
+        return integral;
     }
 
     /**
