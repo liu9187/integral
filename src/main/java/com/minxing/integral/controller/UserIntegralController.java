@@ -65,7 +65,7 @@ public class UserIntegralController {
                 userIntegral.setUserId( userId );
                 // 尝试进行积分兑换
                 int out = userIntegralService.removeUserIntegralByUserId( userIntegral );
-                if (out > 0||out==0) {
+                if (out > 0) {
                     result.put( "message", "兑换成功" );
                     result.put( "out", out );
                 } else {
@@ -229,7 +229,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/ordinaryUser", method = {RequestMethod.GET})
     @ResponseBody
-    public String ordinaryUser(@RequestParam(defaultValue = "count") String type, @RequestParam(defaultValue = "1") Integer order, @RequestParam(required = false) Long timeStart, @RequestParam(name = "nameStr",required = false) String nameStr,@RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String ordinaryUser(@RequestParam(defaultValue = "count") String type, @RequestParam(defaultValue = "0") Integer order, @RequestParam(required = false) Long timeStart, @RequestParam(name = "nameStr",required = false) String nameStr,@RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
         logger.info( "ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize );
          if (null!=timeStart&&null!=timeEnd){
              if (timeStart<timeEnd){
@@ -278,7 +278,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/specialUser", method = {RequestMethod.GET})
     @ResponseBody
-    public String specialUser(@RequestParam(defaultValue = "count2") String type, @RequestParam(defaultValue = "1") Integer order,@RequestParam(name = "nameStr",required = false) String nameStr, @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String specialUser(@RequestParam(defaultValue = "count2") String type, @RequestParam(defaultValue = "0") Integer order,@RequestParam(name = "nameStr",required = false) String nameStr, @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
         logger.info( "ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize );
         if (null!=timeStart&&null!=timeEnd){
             if (timeStart<timeEnd){
