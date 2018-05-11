@@ -252,7 +252,7 @@ public interface UserIntegralMapper {
                         "       IF (SUM(ir.integral_id=1)>0,SUM(ir.integral_id=1),0)+IF(SUM(ir.integral_id=2)>0,SUM(ir.integral_id=2),0)+IF(SUM(ir.integral_id=3)>0,SUM(ir.integral_id=3),0) AS count2 " +
                         "    FROM  users u  " +
                         "    LEFT JOIN integral_record ir ON ir.user_id=u.id " +
-                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id IN(SELECT user_id FROM  roles WHERE role_item_id=#{groupId}) " );
+                        "    WHERE u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} and  u.id IN(SELECT user_id FROM  roles WHERE role_item_id=#{itemId}) " );
 
                 if (!StringUtil.isNull(type) && null !=order){
                     //判断开始时间是否为null
