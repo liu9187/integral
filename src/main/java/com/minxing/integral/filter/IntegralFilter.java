@@ -9,19 +9,18 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Date;
 
 /**
  * @author SuZZ on 2018/4/24.
  */
-@WebFilter(filterName = "integralFilter", urlPatterns = {"/api/v2/integral/removeUserIntegralByUserId","/api/v2/integral/updateIntegralByType","/api/v2/integral/queryList","/api/v2/integral/updateIntegral","/api/v2/integral/selectExchange","/api/v2/integral/ordinaryUser","/api/v2/integral/specialUser"})
 public class IntegralFilter implements Filter {
 
     static Logger logger  = LoggerFactory.getLogger(IntegralFilter.class);
@@ -36,6 +35,7 @@ public class IntegralFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
+
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         // 没有session,开始校验身份

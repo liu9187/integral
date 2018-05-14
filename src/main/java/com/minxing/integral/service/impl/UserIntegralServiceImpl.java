@@ -8,10 +8,13 @@ import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
+import com.minxing.integral.common.util.HttpNetClientUtil;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.IntegralService;
 import com.minxing.integral.service.UserIntegralService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserIntegralServiceImpl implements UserIntegralService {
@@ -36,6 +41,11 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     //特殊用户群组id
     @Value("${role.item.id}")
     private Integer itemId;
+    //特殊用户群组id
+    @Value("${Authorization}")
+    private String Authorization;
+    @Value("${mx.domain}")
+    private String domain;
     /**
      * 积分兑换
      *
@@ -120,6 +130,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                     logger.error("add valid event error");
                     return false;
                 }
+
             }
             //根据事件的类型查出对应积分数据
             Integral integral = userIntegralMapper.selectIntegral(actionType);
@@ -136,6 +147,22 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 logger.error("add integral error");
                 return false;
             }
+            //TODO 增加积分调用第三方接口
+            try{
+                String data_type = "integral";
+                Integer integer=integral.getIntegral().intValue();
+                String value ="integer" ;
+                String user_id =userId;
+                List<NameValuePair> urlParameters = new ArrayList<>();
+                urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
+                urlParameters.add( new BasicNameValuePair( "value", value ) );
+                urlParameters.add( new BasicNameValuePair( "user_id", user_id ));
+                //调用接口
+                HttpNetClientUtil.doPut( urlParameters, Authorization ,domain);
+            }catch (Exception e1){
+                logger.error( "error is addIntegralByUserId" );
+            }
+
             //记录此次事件
             IntegralRecord integralRecord = new IntegralRecord();
             integralRecord.setIntegralId(integral.getId());
