@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -21,6 +22,7 @@ import java.util.Date;
 /**
  * @author SuZZ on 2018/4/24.
  */
+@Component
 public class IntegralFilter implements Filter {
 
     static Logger logger  = LoggerFactory.getLogger(IntegralFilter.class);

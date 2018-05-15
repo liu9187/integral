@@ -3,6 +3,8 @@ import com.minxing.integral.common.util.ErrorJson;
 import com.minxing.integral.common.util.License;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -16,18 +18,18 @@ import java.nio.charset.Charset;
  * @author liuchanglong
  * @date 2018-5-14
  */
+@Component
 public class LicenseFilter implements Filter {
     static Logger logger  = LoggerFactory.getLogger(LicenseFilter.class);
-
+    @Autowired
+    private  License license;
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         //license校验
-             License license=new License();
         HttpServletRequest  req= (HttpServletRequest) request;
         HttpServletResponse res= (HttpServletResponse) response;
         if (!license.checkLicense()) {
