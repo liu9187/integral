@@ -1,47 +1,43 @@
 package com.minxing.integral.filter;
-import com.minxing.integral.common.util.ErrorJson;
+
 import com.minxing.integral.common.util.License;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
-
 
 /**
- * license校验
- * @author liuchanglong
- * @date 2018-5-14
+ * @author SuZZ on 2018/5/14.
  */
-@Component
+@WebFilter(filterName = "Filter0_license",urlPatterns = {"/api/v2/integral/*"})
 public class LicenseFilter implements Filter {
-    static Logger logger  = LoggerFactory.getLogger(LicenseFilter.class);
+
     @Autowired
-    private  License license;
+    private License license;
+    @Value("${license.key}")
+    private String licenseKey;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
+
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        //license校验
-        HttpServletRequest  req= (HttpServletRequest) request;
-        HttpServletResponse res= (HttpServletResponse) response;
-        if (!license.checkLicense()) {
-            ErrorJson errorJson = new ErrorJson("20002", "产品License不支持此功能或此功能已过期，请联系管理员。");
-            logger.error("doFilter checkLicense error[code:400; requestUri:" + req.getRequestURI() + "]>>>产品License不支持此功能或此功能已过期，请联系管理员。");
-            res.setStatus(400);
-            res.setHeader("Content-Type", "application/json");
-            ServletOutputStream out = response.getOutputStream();
-            out.write(errorJson.toJson().getBytes(Charset.forName("utf-8")));
-            out.flush();
-            out.close();
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        // FIXME 暂时关闭了license校验,方便调试使用
+        Boolean licenseKey = license.checkLicenseKey("licenseKey");
+//        Boolean licenseKey = true;
+        if (licenseKey) {
+            filterChain.doFilter(servletRequest, servletResponse);
             return;
+        } else {
+            // 还是没有,返回无权限
+            ((HttpServletResponse) servletResponse).setStatus(400);
+            servletResponse.getWriter().write("{\"errors\":{\"message\":\"产品License不支持此功能或此功能已过期，请联系管理员。(2)\",\"status_code\":\"20000\"}}");
+            servletResponse.getWriter().flush();
         }
     }
 

@@ -1,6 +1,7 @@
 package com.minxing.integral.common.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -33,7 +34,7 @@ public class HttpNetClientUtil {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         JSONObject jsonObject = new JSONObject();
-        HttpPut put = new HttpPut( domain+"/api/v1/user_infos/scores");
+        HttpPut put = new HttpPut( domain+"/api/v1/user_infos/scores_direct");
         try {
             put.setHeader( "Authorization", "Bearer " + auth );
             put.setEntity( new UrlEncodedFormEntity( urlParameters, HTTP.UTF_8 ) );
@@ -45,9 +46,6 @@ public class HttpNetClientUtil {
 
                     String content = EntityUtils.toString( response.getEntity(), "UTF-8" );
                     jsonObject = JSON.parseObject( content );
-                    jsonObject.put( "message", "增加积分成功" );
-                    jsonObject.put( "statusCode", response.getStatusLine().getStatusCode() );
-                    //System.out.println( "报价返回内容是：" + jsonObject.toString() );
                 }
                 EntityUtils.consume( response.getEntity() );//完全消耗
             } catch (IOException e) {
@@ -86,10 +84,10 @@ public class HttpNetClientUtil {
         //urlParameters.add(new BasicNameValuePair("Authorization", Authorization));
         //HashMap<String, String> headers = new HashMap<>();
         String c = doPut( urlParameters, Authorization,domain);
-        //  System.out.print(  c);
-/***
- * {"code":200}
- */
+           Integer object= (Integer) JSONArray.parseObject( c ).get( "code" );
+
+          System.out.print(object);
+
     }
 }
 

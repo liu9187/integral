@@ -1,5 +1,6 @@
 package com.minxing.integral.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.minxing.integral.common.bean.Integral;
@@ -119,6 +120,13 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             if(isValidEvent.equals(actionType)){
                 JSONObject json = JSONObject.parseObject(extParams);
                 Object articleId = json.get("article_id");
+                Integer[] categoryId= (Integer[]) json.get("category_id");
+                      //对 categoryId 进行判断 是否为null
+                      if (null==categoryId ){
+                          logger.error( "error is category_id null" );
+                          return  false;
+                      }
+
                 Integer res = userIntegralMapper.findIsValid(Integer.valueOf(userId), Integer.valueOf(articleId.toString()));
                 if(res > 0){
                     logger.info("userId" +userId+ "and articleId" +articleId+ "is not valid event");
@@ -158,7 +166,13 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 urlParameters.add( new BasicNameValuePair( "value", value ) );
                 urlParameters.add( new BasicNameValuePair( "user_id", user_id ));
                 //调用接口
-                HttpNetClientUtil.doPut( urlParameters, Authorization ,domain);
+                String c =HttpNetClientUtil.doPut( urlParameters, Authorization ,domain);
+                Integer code= (Integer) JSONArray.parseObject( c ).get( "code" );
+                //判断外部接口是否调用成功
+                if (code!=200){
+                    logger.error( "error is doPut code:"+code );
+                    return  false;
+                }
             }catch (Exception e1){
                 logger.error( "error is addIntegralByUserId" );
             }
