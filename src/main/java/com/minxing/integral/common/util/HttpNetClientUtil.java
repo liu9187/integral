@@ -1,7 +1,6 @@
 package com.minxing.integral.common.util;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -10,7 +9,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HttpNetClientUtil {
@@ -70,25 +67,25 @@ public class HttpNetClientUtil {
         return jsonObject.toString();
     }
 
-    public static void main(String[] args) {
-
-        String Authorization = "d0qBA_gUd3PD-HkVzvX253xYCAUo4Q9uhM_wqCd_oPojM0u-";
-        String data_type = "integral";
-        String value = "1";
-        String user_id = "1";
-        String domain="http://dev8.dehuinet.com:8018";
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
-        urlParameters.add( new BasicNameValuePair( "value", value ) );
-        urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
-        //urlParameters.add(new BasicNameValuePair("Authorization", Authorization));
-        //HashMap<String, String> headers = new HashMap<>();
-        String c = doPut( urlParameters, Authorization,domain);
-           Integer object= (Integer) JSONArray.parseObject( c ).get( "code" );
-
-          System.out.print(object);
-
-    }
+//    public static void main(String[] args) {
+//
+//        String Authorization = "d0qBA_gUd3PD-HkVzvX253xYCAUo4Q9uhM_wqCd_oPojM0u-";
+//        String data_type = "integral";
+//        String value = "1";
+//        String user_id = "1";
+//        String domain="http://dev8.dehuinet.com:8018";
+//        List<NameValuePair> urlParameters = new ArrayList<>();
+//        urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
+//        urlParameters.add( new BasicNameValuePair( "value", value ) );
+//        urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
+//        //urlParameters.add(new BasicNameValuePair("Authorization", Authorization));
+//        //HashMap<String, String> headers = new HashMap<>();
+//        String c = doPut( urlParameters, Authorization,domain);
+//           Integer object= (Integer) JSONArray.parseObject( c ).get( "code" );
+//
+//          System.out.print(object);
+//
+//    }
 }
 
 

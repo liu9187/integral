@@ -28,7 +28,7 @@ public class LicenseFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         // FIXME 暂时关闭了license校验,方便调试使用
-        Boolean licenseKey = license.checkLicenseKey("licenseKey");
+          Boolean  licenseKey = license.checkLicenseKey("integral");
 //        Boolean licenseKey = true;
         if (licenseKey) {
             filterChain.doFilter(servletRequest, servletResponse);
