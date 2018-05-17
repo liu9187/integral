@@ -122,11 +122,10 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
         try {
             JSONObject json = JSONObject.parseObject( extParams );
-            Integer[] categoryId = (Integer[]) json.get( "category_id" );
+                 Object categoryId=json.get("category_id");
             //对 categoryId 进行判断 是否为空 如果为空将要被拦截
-
-            if (null == categoryId || (null !=categoryId && categoryId.length==0)) {
-                logger.error( "error is category_id null" );
+            if ( categoryId.equals( null )|| (!categoryId.equals( null ) && categoryId.toString().length()==0)) {
+                logger.error( "error is category_id null:" +categoryId);
                 return false;
             }
             //判断是否是有效事件(只有阅读)
@@ -277,4 +276,6 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     public void setIntegralService(IntegralService integralService) {
         this.integralService = integralService;
     }
+
 }
+
