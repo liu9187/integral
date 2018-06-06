@@ -6,9 +6,7 @@ import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
-import com.minxing.integral.common.util.ServletUtil;
 import com.minxing.integral.common.util.StringUtil;
-import com.minxing.integral.controller.UserIntegralController;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.*;
 import org.slf4j.Logger;
@@ -74,7 +72,7 @@ public interface UserIntegralMapper {
      * 通过userid增加积分
      * @return
      */
-    @Update("UPDATE user_infos SET integral=IFNULL(integral,0)+#{integrals} WHERE user_id=#{userId};")
+    @Update("UPDATE user_infos SET integral=integral+#{integrals} WHERE user_id=#{userId};")
     Integer addIntegralByUserId(@Param("userId") Integer userId, @Param("integrals") Integer integrals);
 
     /**
@@ -128,6 +126,15 @@ public interface UserIntegralMapper {
      */
     @Select("SELECT integral_exchange FROM integral_exchange  WHERE id=1")
     Integer selectExchange();
+
+    /**
+     * 查询是否为普通用户
+     * @param userId
+     * @param itemId
+     * @return
+     */
+    @Select( "SELECT user_id FROM  roles WHERE role_item_id=#{itemId} AND user_id=#{userId}" )
+    String selectOrdinaryUser(@Param("userId")String userId,@Param("itemId") Integer itemId);
 
     /**
      * 普通用户统计
@@ -350,6 +357,7 @@ public interface UserIntegralMapper {
             logger.info("查询sql=="+sql.toString());
             return sql.toString();
         }
+
     }
 }
 

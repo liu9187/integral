@@ -22,10 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.minxing.integral.service.IntegralService.OCU_ARTICLE_FORWARD;
 
 @Service
 public class UserIntegralServiceImpl implements UserIntegralService {
@@ -47,6 +50,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     private String Authorization;
     @Value("${mx.domain}")
     private String domain;
+    private TransactionTemplate template;
 
     /**
      * 积分兑换
@@ -108,7 +112,6 @@ public class UserIntegralServiceImpl implements UserIntegralService {
         return userIntegralMapper.updateIntegral( integralModification );
     }
 
-    //TODO 增加积分部分添加单独的接口供三方实现
 
     /**
      * 增加积分
@@ -117,16 +120,14 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
-    @Transactional
     public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
-
         try {
             JSONObject json = JSONObject.parseObject( extParams );
-                 Object categoryId=json.get("category_id");
             //对 categoryId 进行判断 是否为空 如果为空将要被拦截
-            if ( categoryId.equals( null )|| (!categoryId.equals( null ) && categoryId.toString().length()==0)) {
-                logger.error( "error is category_id null:" +categoryId);
-                return false;
+            JSONArray categoryId = (JSONArray) json.get( "category_id" );
+            if (categoryId == null || categoryId.size() == 0) {
+                logger.info( "error is category_id :  " + categoryId );
+                return true;
             }
             //判断是否是有效事件(只有阅读)
             if (isValidEvent.equals( actionType )) {
@@ -153,32 +154,63 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 logger.error( "integral number error" );
                 return false;
             }
-            //增加积分
-            Integer res = userIntegralMapper.addIntegralByUserId( Integer.valueOf( userId ), integral.getIntegral().intValue() );
-            if (1 != res) {
-                logger.error( "add integral error" );
-                return false;
-            }
-            //TODO 增加积分调用第三方接口
-            try {
-                String data_type = "integral";
-                Integer integer = integral.getIntegral().intValue();
-                String value = "integer";
-                String user_id = userId;
-                List<NameValuePair> urlParameters = new ArrayList<>();
-                urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
-                urlParameters.add( new BasicNameValuePair( "value", value ) );
-                urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
-                //调用接口
-                String c = HttpNetClientUtil.doPut( urlParameters, Authorization, domain );
-                Integer code = (Integer) JSONArray.parseObject( c ).get( "code" );
-                //判断外部接口是否调用成功
-                if (code != 200) {
-                    logger.error( "error is doPut code:" + code );
+            //判断user是不是普通用户 如果是普通用户转发不加积分
+            String isnull = userIntegralMapper.selectOrdinaryUser( userId, itemId );
+            if (StringUtils.isEmpty( isnull ) && actionType.equals( OCU_ARTICLE_FORWARD )) {
+                logger.info( "this user is OrdinaryUser:  userId=" + userId + "--------------" + "itemId=" + itemId );
+            } else {
+                //查询用户的积分情况
+                //增加积分之前用户积分
+                Integer userIntegral;
+                userIntegral = userIntegralMapper.selectIntegralByUserId( Integer.valueOf( userId ) );
+                logger.info( "start: userIntegral -----------" +userIntegral);
+                if (null == userIntegral) {
+                    logger.error( "error is selectIntegralByUserId, userIntegral:" + userIntegral );
                     return false;
                 }
-            } catch (Exception e1) {
-                logger.error( "error is addIntegralByUserId" );
+                //增加积分
+                Integer res = userIntegralMapper.addIntegralByUserId( Integer.valueOf( userId ), integral.getIntegral().intValue() );
+                if (1 != res) {
+                    logger.error( "add integral error" );
+                    return false;
+                }
+                //增加之后用户积分
+                userIntegral = userIntegralMapper.selectIntegralByUserId( Integer.valueOf( userId ) );
+                logger.info( "end: userIntegral -----------" +userIntegral);
+
+                //TODO 增加积分调用Ruby接口
+                try {
+                     //数据类型
+                    String data_type = "integral";
+                    //用户积分总数
+                    Integer integer = userIntegral;
+                    String value = integer.toString();
+                    //用户
+                    String user_id = userId;
+                    List<NameValuePair> urlParameters = new ArrayList<>();
+                    urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
+                    urlParameters.add( new BasicNameValuePair( "value", value ) );
+                    urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
+                    //调用接口需要的参数
+                    logger.info( "Ruby interface call parameters: data_type=" + data_type + "-----value=" + value + "-----user_id=" + user_id );
+
+                    //调用接口
+                    String c = HttpNetClientUtil.doPut( urlParameters, Authorization, domain );
+                    Integer code = (Integer) JSONArray.parseObject( c ).get( "code" );
+                    if (code == null) {
+                        logger.error( "Ruby interface call failed1 code:" + code );
+                    } else {
+                        //判断外部接口是否调用成功
+                        if (code != 200) {
+                            logger.warn( "Ruby interface call failed2 code:" + code );
+                            return true;
+                        }
+                    }
+
+                } catch (Exception e1) {
+                    logger.error( "Ruby interface call exception", e1 );
+                }
+
             }
 
             //记录此次事件
@@ -194,7 +226,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error( "event operation error" );
+            logger.error( "event operation error", e );
             return false;
         }
         return true;
