@@ -180,6 +180,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.minxing365.dbschema</groupId>
+            <artifactId>migrate</artifactId>
+            <version>1.0.2.01</version>
+        </dependency>
     </dependencies>
 
 
@@ -307,5 +312,5 @@
             </resource>
         </resources>
     </build>
-    
+
 </project>

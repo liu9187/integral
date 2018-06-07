@@ -77,8 +77,14 @@ case "$1" in
         ${0} stop
         ${0} start
         ;;
+
+  update)
+        echo -n "update $DESC... "
+        cd $serverdir
+        $DAEMON -Dconf=config/conf.properties -jar $serverjar update
+        ;;
   *)
-        echo "Usage: /etc/init.d/$server_name {start|stop|restart|force-reload}" >&2
+        echo "Usage: /etc/init.d/$server_name {start|stop|restart|force-reload|update}" >&2
         exit 1
         ;;
 esac

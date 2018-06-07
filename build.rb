@@ -6,6 +6,8 @@ system "mv /home/ewhine/deploy/mx_integral/integral-*.jar /home/ewhine/deploy/mx
 system "cp -r /home/ewhine/ewhine_pkg/mx_integral/integral-*.jar /home/ewhine/deploy/mx_integral/."
 system "cp -r /home/ewhine/ewhine_pkg/mx_integral/bin/mx_integral /home/ewhine/deploy/mx_integral/bin/mx_integral"
 system "rm -rf /home/ewhine/ewhine_pkg"
-system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral restart" > /dev/null  2>&1  &'
+system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral stop" > /dev/null  2>&1  &'
+system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral update" > /dev/null  2>&1  &'
+system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral start" > /dev/null  2>&1  &'
 puts "complete"
 
