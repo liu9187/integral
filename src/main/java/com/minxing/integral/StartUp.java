@@ -33,7 +33,7 @@ public class StartUp {
             List<String> migrateList = new ArrayList<>();
             migrateList.add("2018060701.sql");
 
-            String configPath = System.getProperty("conf");
+            String configPath = System.getProperty("spring.config.location");
             if (null == configPath) {
                 System.err.println("未指定配置文件！");
                 System.exit(0);
