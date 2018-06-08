@@ -5,11 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.minxing.integral.common.bean.Integral;
 import com.minxing.integral.common.bean.IntegralRecord;
+import com.minxing.integral.common.bean.Person;
 import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
-import com.minxing.integral.common.util.HttpNetClientUtil;
+import com.minxing.integral.common.util.PersonHelper;
 import com.minxing.integral.dao.UserIntegralMapper;
 import com.minxing.integral.service.IntegralService;
 import com.minxing.integral.service.UserIntegralService;
@@ -120,7 +121,9 @@ public class UserIntegralServiceImpl implements UserIntegralService {
      * @return
      */
     @Override
+    @Transactional
     public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
+
         try {
             JSONObject json = JSONObject.parseObject( extParams );
             //对 categoryId 进行判断 是否为空 如果为空将要被拦截
@@ -161,7 +164,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             } else {
                 //查询用户的积分情况
                 //增加积分之前用户积分
-                Integer userIntegral;
+                 Integer userIntegral;
                 userIntegral = userIntegralMapper.selectIntegralByUserId( Integer.valueOf( userId ) );
                 logger.info( "start: userIntegral -----------" +userIntegral);
                 if (null == userIntegral) {
@@ -179,37 +182,34 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                 logger.info( "end: userIntegral -----------" +userIntegral);
 
                 //TODO 增加积分调用Ruby接口
-                try {
-                     //数据类型
-                    String data_type = "integral";
-                    //用户积分总数
-                    Integer integer = userIntegral;
-                    String value = integer.toString();
-                    //用户
-                    String user_id = userId;
-                    List<NameValuePair> urlParameters = new ArrayList<>();
-                    urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
-                    urlParameters.add( new BasicNameValuePair( "value", value ) );
-                    urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
-                    //调用接口需要的参数
-                    logger.info( "Ruby interface call parameters: data_type=" + data_type + "-----value=" + value + "-----user_id=" + user_id );
-
-                    //调用接口
-                    String c = HttpNetClientUtil.doPut( urlParameters, Authorization, domain );
-                    Integer code = (Integer) JSONArray.parseObject( c ).get( "code" );
-                    if (code == null) {
-                        logger.error( "Ruby interface call failed1 code:" + code );
-                    } else {
-                        //判断外部接口是否调用成功
-                        if (code != 200) {
-                            logger.warn( "Ruby interface call failed2 code:" + code );
-                            return true;
+                        try {
+                            //数据类型
+                            String data_type = "integral";
+                            //用户积分总数
+                            Integer integer = userIntegral;
+                            String value = integer.toString();
+                            //用户
+                            String user_id = userId;
+                            List<NameValuePair> urlParameters = new ArrayList<>();
+                            urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
+                            urlParameters.add( new BasicNameValuePair( "value", value ) );
+                            urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
+                            //调用接口需要的参数
+                            logger.info( "Ruby interface call parameters: data_type=" + data_type + "-----value=" + value + "-----user_id=" + user_id );
+                             //事件加入环形缓冲区
+                            Person person=new Person(  );
+                                person.setAuth( Authorization );
+                                person.setDomain( domain );
+                                person.setUrlParameters( urlParameters );
+                            PersonHelper.start();
+                            PersonHelper.produce( person );
+//                            //调用接口
+//                            Thread thread=new Thread( new HttpNetClientUtil().doPut( urlParameters,Authorization,domain ));
+//                            //开启线程
+//                            thread.start();
+                        } catch (Exception e1) {
+                            logger.error( "Ruby interface call exception", e1 );
                         }
-                    }
-
-                } catch (Exception e1) {
-                    logger.error( "Ruby interface call exception", e1 );
-                }
 
             }
 

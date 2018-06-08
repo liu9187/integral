@@ -1,7 +1,10 @@
-package com.minxing.integral.common.util;
+package com.minxing.integral.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.minxing.integral.common.bean.Person;
+import com.minxing.integral.common.event.PersonEvent;
+import com.minxing.integral.common.util.HttpNetClientUtil;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -9,7 +12,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -17,24 +19,26 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 调用外部接口异步类
+ * 消息事件处理器
  */
-public class HttpNetClientUtil {
+public class PersonEventHandler implements com.lmax.disruptor.EventHandler<PersonEvent> {
+    Logger logger = LoggerFactory.getLogger( HttpNetClientUtil.class );
+    public PersonEventHandler(){
+//        DataSendHelper.start();
+    }
 
-  static   Logger logger = LoggerFactory.getLogger( HttpNetClientUtil.class );
-
-
-    /**
-     * PUT基础请求
-     *
-     * @param urlParameters 提交参数
-     * @return byte[] 请求成功后的结果
-     */
-    public  String doPut(List<NameValuePair> urlParameters, String auth,String domain) {
+    @Override
+    public void onEvent(PersonEvent event, long sequence, boolean endOfBatch) throws Exception {
+        Person person=event.getPerson();
+        //赋值
+        String domain=person.getDomain();
+        String auth=person.getAuth();
+        List<NameValuePair>  urlParameters= person.getUrlParameters();
+        logger.info("domain----"+domain+"-----auth------"+auth );
+        //调用
         CloseableHttpClient httpclient = HttpClients.createDefault();
         CloseableHttpResponse response = null;
         JSONObject jsonObject = new JSONObject();
@@ -83,42 +87,6 @@ public class HttpNetClientUtil {
             }
         }
         logger.info( "code:======="+ code);
-        return jsonObject.toJSONString();
-    }
-
-    public static void main(String[] args) {
-
-       // String Authorization = "xD-QV_ivzddg612BEpSZe9ROA7r6SqO2DlIMSPAQF1nYlDxt";
-        String Authorization ="d0qBA_gUd3PD-HkVzvX253xYCAUo4Q9uhM_wqCd_oPojM0u-";
-        String data_type = "integral";
-        String value = "1";
-        String user_id = "1";
-        String domain="http://dev8.dehuinet.com:8018";
-        //String domain="http://test.dehuinet.com:8030";
-
-       // String data_type = "integral";
-       // Integer integer = integral.getIntegral().intValue();
-       // String value = "integer";
-       // String user_id = userId;
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add( new BasicNameValuePair( "data_type", data_type ) );
-        urlParameters.add( new BasicNameValuePair( "value", value ) );
-        urlParameters.add( new BasicNameValuePair( "user_id", user_id ) );
-        //调用接口
-        //HttpNetClientUtil.doPut( urlParameters, Authorization, domain );
-       // Integer code = (Integer) JSONArray.parseObject( c ).get( "code" );
-        //判断外部接口是否调用成功
-//        if (code != 200) {
-//           // logger.error( "error is doPut code:" + code );
-//            System.out.println( "添加失败" );
-//            //return false;
-//        }else{
-//            System.out.println( "添加成功" +code);
-//        }
-
-
+      //  return jsonObject.toJSONString();
     }
 }
-
-
-
