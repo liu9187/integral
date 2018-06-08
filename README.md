@@ -4,3 +4,10 @@
 2、提供web端积分统计功能，进行积分兑换。
 3、提供普通用户统计以及特殊用户统计接口。
 4、初始化创建表（integral、integral_exchange、integral_record、valid_event）
+```
+
+## 2018年6月7日 ##
+```text
+1、添加migrate工具
+
+```

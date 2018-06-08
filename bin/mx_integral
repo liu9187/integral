@@ -38,8 +38,7 @@ set -e
 iden=mx_integral
 identity="-Didentity=$iden"
 
-ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -jar  $serverdir/$serverjar"
-# ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dconf=$serverdir/config/conf.properties -Dmybatis=$serverdir/config/mybatisConfig.xml -Dlogback=$serverdir/config/logback.xml -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*:$server_thirdpartylib/*:" com.minxing.integral.StartUp"
+ARGS="-server -Xms$min_heap_size -Xmx$max_heap_size -Dspring.config.location=$serverdir/config/application.properties -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*.jar:$server_thirdpartylib/*.jar:" -jar  $serverdir/$serverjar"
 
 case "$1" in
   start)
@@ -77,8 +76,14 @@ case "$1" in
         ${0} stop
         ${0} start
         ;;
+
+  update)
+        echo -n "update $DESC... "
+        cd $serverdir
+        $DAEMON -Dspring.config.location=$serverdir/config/application.properties -Dfile.encoding=UTF-8 -cp "$serverdir/*.jar:$server_lib/*.jar:$server_thirdpartylib/*.jar:" -jar  $serverdir/$serverjar update
+        ;;
   *)
-        echo "Usage: /etc/init.d/$server_name {start|stop|restart|force-reload}" >&2
+        echo "Usage: /etc/init.d/$server_name {start|stop|restart|force-reload|update}" >&2
         exit 1
         ;;
 esac
