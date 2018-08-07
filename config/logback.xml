@@ -2,8 +2,8 @@
 <configuration scan="true">
 	<property scope="system" name="APP_NAME" value="mx_integral" />
 	<property scope="system" name="APP_ENV" value="development" />
-	<!--<property scope="system" name="LOG_DIR" value="/home/ewhine/deploy/mx_integral/logs" />-->
-	<property scope="system" name="LOG_DIR" value="./logs" />
+	<property scope="system" name="LOG_DIR" value="/home/ewhine/deploy/mx_integral/logs" />
+	<!--<property scope="system" name="LOG_DIR" value="./logs" />-->
 
 	<!-- 日志写入文件系统 -->
 	<appender name="ROLLING"

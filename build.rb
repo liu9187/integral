@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 #encoding=utf-8
-system "rm -rf /home/ewhine/deploy/mx_integral/old"
-system "mkdir /home/ewhine/deploy/mx_integral/old"
-system "mv /home/ewhine/deploy/mx_integral/integral-*.jar /home/ewhine/deploy/mx_integral/old/."
-system "cp -r /home/ewhine/ewhine_pkg/mx_integral/integral-*.jar /home/ewhine/deploy/mx_integral/."
-system "cp -r /home/ewhine/ewhine_pkg/mx_integral/bin/mx_integral /home/ewhine/deploy/mx_integral/bin/mx_integral"
+PROJECT="mx_integral"
+system "rm -rf /home/ewhine/deploy/#{PROJECT}/old"
+system "mkdir /home/ewhine/deploy/#{PROJECT}/old"
+system "mv /home/ewhine/deploy/#{PROJECT}/*.jar /home/ewhine/deploy/#{PROJECT}/old/."
+system "cp -r /home/ewhine/ewhine_pkg/#{PROJECT}/*.jar /home/ewhine/deploy/#{PROJECT}/."
+system "cp -r /home/ewhine/ewhine_pkg/#{PROJECT}/bin/#{PROJECT} /home/ewhine/deploy/#{PROJECT}/bin/#{PROJECT}"
+system "cp -r /home/ewhine/ewhine_pkg/#{PROJECT}/version.txt /home/ewhine/deploy/#{PROJECT}/version.txt"
 system "rm -rf /home/ewhine/ewhine_pkg"
-system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral stop" > /dev/null  2>&1  &'
-system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral update" > /dev/null  2>&1  &'
-system 'nohup bash -l -c "sleep 5 && /etc/init.d/mx_integral start" > /dev/null  2>&1  &'
+system "/etc/init.d/#{PROJECT} stop"
+system "/etc/init.d/#{PROJECT} update"
+system "/etc/init.d/#{PROJECT} start"
 puts "complete"
 

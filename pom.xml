@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.minxing</groupId>
-    <artifactId>integral</artifactId>
-    <version>0.0.1</version>
+    <artifactId>mx_integral</artifactId>
+    <version>1.0.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <build.version>0.0.1</build.version>
     </properties>
 
     <name>mx_integral</name>
@@ -27,7 +26,7 @@
         <repository>
             <id>dehuinetmaven_thirdparty</id>
             <name>dehuinetmaven_thirdparty</name>
-            <url>http://maven.dehuinet.com:8081/nexus/content/repositories/thirdparty/&lt;/url&gt;</url>
+            <url>http://maven.dehuinet.com:8081/nexus/content/repositories/thirdparty/</url>
             <snapshots>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
@@ -195,7 +194,24 @@
 
 
     <build>
+        <finalName>${project.artifactId}-${project.version}_${timestamp}</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <timestampFormat>yyyyMMddHHmmss</timestampFormat>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -221,7 +237,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/ewhine_pkg/mx_integral/config</outputDirectory>
+                            <outputDirectory>target/ewhine_pkg/${project.artifactId}/config</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>config</directory>
@@ -237,7 +253,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/ewhine_pkg/mx_integral/shell</outputDirectory>
+                            <outputDirectory>target/ewhine_pkg/${project.artifactId}/shell</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>shell</directory>
@@ -253,7 +269,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/ewhine_pkg/mx_integral/bin</outputDirectory>
+                            <outputDirectory>target/ewhine_pkg/${project.artifactId}/bin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>bin</directory>
@@ -277,7 +293,7 @@
                             <mainClass>com.minxing.integral.StartUp</mainClass>
                         </manifest>
                     </archive>
-                    <outputDirectory>target/ewhine_pkg/mx_integral</outputDirectory>
+                    <outputDirectory>target/ewhine_pkg/${project.artifactId}</outputDirectory>
                     <excludes>
                         <exclude>*.properties</exclude>
                     </excludes>
@@ -296,7 +312,7 @@
                         <configuration>
                             <outputDirectory>
                                 <!-- 读注：这里如果写不加变量的路径，比如target/ewhine_pkg/pns/lib，如果你的项目位置是D:\Projects\dhzh\pns，则这个target是指的D:\Projects\dhzh\pns\target -->
-                                target/ewhine_pkg/mx_integral/lib
+                                target/ewhine_pkg/${project.artifactId}/lib
                             </outputDirectory>
                         </configuration>
                     </execution>
