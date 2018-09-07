@@ -1,8 +1,12 @@
 package com.minxing.integral.common.bean;
 
+/**
+ * 用户列表
+ */
 public class UserInfos {
     private Integer userId;
     private Long integral;
+    private Long meritScore;
 
     public Integer getUserId() {
         return userId;
@@ -18,5 +22,13 @@ public class UserInfos {
 
     public void setIntegral(Long integral) {
         this.integral = integral;
+    }
+
+    public Long getMeritScore() {
+        return meritScore;
+    }
+
+    public void setMeritScore(Long meritScore) {
+        this.meritScore = meritScore;
     }
 }

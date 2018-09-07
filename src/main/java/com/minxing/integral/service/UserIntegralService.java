@@ -4,10 +4,8 @@ import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 用户积分service
@@ -20,14 +18,14 @@ public interface UserIntegralService {
      * @param userIntegral
      * @return
      */
-    Integer removeUserIntegralByUserId(UserInfos userIntegral);
+    String removeUserIntegralByUserId(UserInfos userIntegral);
 
     /**
      * 积分管理数据显示
      * @param order 排序 0 降序  1升序
      * @return
      */
-    List<IntegralManagementVO> queryList(String networkId,String nameStr,Integer order);
+    List<IntegralManagementVO> queryList(String networkId,String nameStr,Integer order,String type);
 
     /**
      * 积分设置
@@ -56,6 +54,13 @@ public interface UserIntegralService {
      * @return
      */
     Integer selectExchange();
+
+    /**
+     * 查询积分和勋值
+     * @param userId
+     * @return
+     */
+    UserInfos selectMeritByUserId(Integer userId);
 
     /**
      * 普通用户统计

@@ -8,7 +8,6 @@ import com.minxing.integral.common.bean.UserInfos;
 import com.minxing.integral.common.exception.DateErrorException;
 import com.minxing.integral.common.exception.IntegrationErrorException;
 import com.minxing.integral.common.exception.ParameterErrorException;
-import com.minxing.integral.common.exception.PointsExchangeException;
 import com.minxing.integral.common.pojo.vo.IntegralManagementVO;
 import com.minxing.integral.common.pojo.vo.OrdinaryUserVO;
 import com.minxing.integral.common.pojo.vo.SpecialUserVO;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -51,8 +51,8 @@ public class UserIntegralController {
     @RequestMapping(value = "/removeUserIntegralByUserId", method = {RequestMethod.PUT})
     @ResponseBody
     public String removeUserIntegralByUserId(@RequestParam(name = "userId", required = false) Integer userId, @RequestParam(name = "integral", required = false) Long integral, HttpServletResponse response) throws Exception {
-        JSONObject result = new JSONObject();
         // 接收到积分兑换请求
+        String result = new String();
         logger.info( "Receive integral exchange request with userId:" + userId + "  integral: " + integral );
         if (userId == null || integral == null) {
             // 参数错误返回http状态码400
@@ -64,25 +64,13 @@ public class UserIntegralController {
                 userIntegral.setIntegral( integral );
                 userIntegral.setUserId( userId );
                 // 尝试进行积分兑换
-                int out = userIntegralService.removeUserIntegralByUserId( userIntegral );
-                  //兑换积分以后积分剩余大于零的情况
-                if (out > 0) {
-                    result.put( "message", "兑换成功" );
-                    result.put( "out", out );
-                }else if (out==0){
-                    result.put( "message", "兑换成功" );
-                    result.put( "out", out );
-                }
-                else {
-                    // 参数错误返回http状态码400
-                    //积分余额不足
-                    throw new PointsExchangeException();
-                }
+                 result = userIntegralService.removeUserIntegralByUserId( userIntegral );
+
             } catch (Exception e) {
                 logger.error( "error controller  removeUserIntegralByUserId" + e );
                 throw e;
             }
-            return result.toJSONString();
+            return result;
         }
     }
 
@@ -134,7 +122,7 @@ public class UserIntegralController {
     }
 
     /**
-     * 积分管理页面显示
+     * 积分勋值统计
      *
      * @param pageNum  当前页
      * @param pageSize 当前页记录
@@ -142,23 +130,21 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/queryList", method = {RequestMethod.GET})
     @ResponseBody
-    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "20", name = "pageSize") Integer pageSize,@RequestParam(name = "nameStr",required =false) String nameStr, @RequestParam(defaultValue = "0", name = "order") Integer order, @RequestParam(defaultValue = "integral") String type, HttpServletResponse response, HttpServletRequest request) {
+    public String queryList(@RequestParam(defaultValue = "1", name = "pageNum") Integer pageNum, @RequestParam(defaultValue = "20", name = "pageSize") Integer pageSize, @RequestParam(name = "nameStr", required = false) String nameStr, @RequestParam(defaultValue = "0", name = "order") Integer order, @RequestParam(defaultValue = "integral" ,name = "type") String type, HttpServletResponse response, HttpServletRequest request) {
         if (null == order) {
             ErrorJson errorJson = new ErrorJson( "20004", "参数问题" );
             return errorJson.toJson();
         }
-        String networkId=null;
+        String networkId = null;
         try {
-             //获取 networkId
-//            Network network=new Network();
-//            networkId=network.getNetworkId();
-            networkId = (String) request.getSession().getAttribute( "networkId" );
+           //   networkId=String.valueOf( 3 );
+             networkId = (String) request.getSession().getAttribute( "networkId" );
         } catch (Exception e) {
             logger.error( "error is controller querList networkId" );
             new ParameterErrorException();
         }
         PageHelper.startPage( pageNum, pageSize );
-        List<IntegralManagementVO> vos = userIntegralService.queryList(networkId ,nameStr,order);
+        List<IntegralManagementVO> vos = userIntegralService.queryList( networkId, nameStr, order ,type);
         PageInfo<IntegralManagementVO> pageInfo = new PageInfo<>( vos );
         JSONObject jsonObject = new JSONObject();
         jsonObject.put( "vos", vos );
@@ -182,7 +168,7 @@ public class UserIntegralController {
     @RequestMapping(value = "/updateIntegral", method = {RequestMethod.PUT})
     @ResponseBody
     public String updateIntegral(@RequestParam Long integralModification, HttpServletResponse response) throws Exception {
-        if (null==integralModification){
+        if (null == integralModification) {
             throw new IntegrationErrorException();
         }
         JSONObject jsonObject = new JSONObject();
@@ -234,18 +220,18 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/ordinaryUser", method = {RequestMethod.GET})
     @ResponseBody
-    public String ordinaryUser(@RequestParam(defaultValue = "count") String type, @RequestParam(defaultValue = "0") Integer order, @RequestParam(required = false) Long timeStart, @RequestParam(name = "nameStr",required = false) String nameStr,@RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String ordinaryUser(@RequestParam(defaultValue = "count") String type, @RequestParam(defaultValue = "0") Integer order, @RequestParam(required = false) Long timeStart, @RequestParam(name = "nameStr", required = false) String nameStr, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
         logger.info( "ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize );
-         if (null!=timeStart&&null!=timeEnd){
-             if (timeStart<timeEnd){
-                 //开始时间大于结束时间
-                 logger.error( "error is timeStart and timeEnd  " );
-                 new DateErrorException();
-             }
-         }
+        if (null != timeStart && null != timeEnd) {
+            if (timeStart < timeEnd) {
+                //开始时间大于结束时间
+                logger.error( "error is timeStart and timeEnd  " );
+                new DateErrorException();
+            }
+        }
 
         JSONObject jsonObject = new JSONObject();
-        String networkId="3";
+        String networkId = "3";
         try {
             //获取 networkId
             networkId = (String) request.getSession().getAttribute( "networkId" );
@@ -254,7 +240,7 @@ public class UserIntegralController {
             new ParameterErrorException();
         }
         try {
-            List<OrdinaryUserVO> vos = userIntegralService.ordinaryUser( type, order, timeStart, timeEnd, pageNum, pageSize, networkId,nameStr );
+            List<OrdinaryUserVO> vos = userIntegralService.ordinaryUser( type, order, timeStart, timeEnd, pageNum, pageSize, networkId, nameStr );
             PageInfo<OrdinaryUserVO> page = new PageInfo( vos );
             //把分页信息和查询结果加入到json对象当中
             jsonObject.put( "code", 200 );
@@ -283,17 +269,17 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/specialUser", method = {RequestMethod.GET})
     @ResponseBody
-    public String specialUser(@RequestParam(defaultValue = "count2") String type, @RequestParam(defaultValue = "0") Integer order,@RequestParam(name = "nameStr",required = false) String nameStr, @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String specialUser(@RequestParam(defaultValue = "count2") String type, @RequestParam(defaultValue = "0") Integer order, @RequestParam(name = "nameStr", required = false) String nameStr, @RequestParam(required = false) Long timeStart, @RequestParam(required = false) Long timeEnd, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "20") Integer pageSize, HttpServletResponse response, HttpServletRequest request) throws Exception {
         logger.info( "ordinaryUser params is type:" + type + " order:" + order + " timeStart:" + timeStart + " timeEnd:" + timeEnd + "pageNum:" + pageNum + "pageSize:" + pageSize );
-        if (null!=timeStart&&null!=timeEnd){
-            if (timeStart<timeEnd){
+        if (null != timeStart && null != timeEnd) {
+            if (timeStart < timeEnd) {
                 //开始时间大于结束时间
                 logger.error( "error is timeStart and timeEnd  " );
                 new DateErrorException();
             }
         }
         JSONObject jsonObject = new JSONObject();
-        String networkId=null;
+        String networkId = null;
         try {
             //获取 networkId
             networkId = (String) request.getSession().getAttribute( "networkId" );
@@ -302,7 +288,7 @@ public class UserIntegralController {
             new ParameterErrorException();
         }
         try {
-            List<SpecialUserVO> vos = userIntegralService.specialUser( type, order, timeStart, timeEnd, pageNum, pageSize, networkId,nameStr );
+            List<SpecialUserVO> vos = userIntegralService.specialUser( type, order, timeStart, timeEnd, pageNum, pageSize, networkId, nameStr );
             PageInfo<OrdinaryUserVO> page = new PageInfo( vos );
             //把数据封装到json对象当中
             jsonObject.put( "code", 200 );
@@ -315,6 +301,28 @@ public class UserIntegralController {
         }
         response.setStatus( 200 );
         return jsonObject.toJSONString();
+    }
+
+    /**
+     * 勋值查询
+     *
+     * @param userId
+     * @return 勋值 积分
+     */
+    @RequestMapping(value = "/selectMeritByUserId", method = {RequestMethod.GET})
+    @ResponseBody
+    public String selectMeritByUserId(@RequestParam(name = "userId") Integer userId) {
+        JSONObject jb = new JSONObject();
+        if (null != userId) {
+            UserInfos userInfos = userIntegralService.selectMeritByUserId( userId );
+            jb.put( "userInfos", userInfos );
+        } else {
+            logger.error( "<<<<<<<<<<传入参数错误：userId=" + userId );
+            ErrorJson errorJson = new ErrorJson( "20004", "<<<<selectMeritByUserId参数错误" );
+            return errorJson.toJson();
+        }
+
+        return jb.toJSONString();
     }
 
 }

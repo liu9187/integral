@@ -22,7 +22,9 @@ import java.util.Date;
 /**
  * @author SuZZ on 2018/4/24.
  */
-@WebFilter(filterName = "Filter1_integral",urlPatterns = {"/api/v2/integral/removeUserIntegralByUserId","/api/v2/integral/updateIntegralByType","/api/v2/integral/queryList","/api/v2/integral/updateIntegral","/api/v2/integral/selectExchange","/api/v2/integral/ordinaryUser","/api/v2/integral/specialUser"})
+@WebFilter(filterName = "Filter1_integral",urlPatterns = {"/api/v2/integral/removeUserIntegralByUserId","/api/v2/integral/updateIntegralByType",
+        "/api/v2/queryList","/api/v2/integral/updateIntegral",
+        "/api/v2/integral/selectExchange","/api/v2/integral/ordinaryUser","/api/v2/integral/specialUser","/api/v2/integral/selectMeritByUserId"})
 public class IntegralFilter implements Filter {
 
     static Logger logger  = LoggerFactory.getLogger(IntegralFilter.class);

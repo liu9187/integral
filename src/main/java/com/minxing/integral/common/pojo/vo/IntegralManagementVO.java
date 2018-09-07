@@ -17,6 +17,10 @@ public class IntegralManagementVO {
      * 部门名称
      */
     private String shortName;
+    /**
+     * 勋值
+     */
+    private Long meritScore;
 
     public Integer getId() {
         return id;
@@ -48,5 +52,13 @@ public class IntegralManagementVO {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public Long getMeritScore() {
+        return meritScore;
+    }
+
+    public void setMeritScore(Long meritScore) {
+        this.meritScore = meritScore;
     }
 }
