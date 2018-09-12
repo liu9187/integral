@@ -84,7 +84,7 @@ public class UserIntegralController {
      */
     @RequestMapping(value = "/addIntegral", method = {RequestMethod.POST})
     @ResponseBody
-    public Object addIntegral(@RequestParam String userId, @RequestParam String extParams, @RequestParam String actionType, HttpServletResponse response) throws Exception {
+    public String addIntegral(@RequestParam String userId, @RequestParam(name = "extParams",defaultValue = "") String extParams, @RequestParam String actionType, HttpServletResponse response) throws Exception {
         logger.info( "Receive exchange register request with userId:" + userId + " actionType:" + actionType );
         if (userId == null || StringUtil.isNull( actionType )) {
             throw new ParameterErrorException();
@@ -94,7 +94,9 @@ public class UserIntegralController {
             throw new IntegrationErrorException();
         }
         response.setStatus( 200 );
-        return "successful";
+        JSONObject jsonObject=new JSONObject(  );
+           jsonObject.put( "message" ,"ok");
+        return jsonObject.toJSONString();
     }
 
     /**
@@ -137,7 +139,7 @@ public class UserIntegralController {
         }
         String networkId = null;
         try {
-           //   networkId=String.valueOf( 3 );
+             //networkId=String.valueOf( 3 );
              networkId = (String) request.getSession().getAttribute( "networkId" );
         } catch (Exception e) {
             logger.error( "error is controller querList networkId" );
@@ -304,7 +306,7 @@ public class UserIntegralController {
     }
 
     /**
-     * 勋值查询
+     * 勋值查询 显示
      *
      * @param userId
      * @return 勋值 积分

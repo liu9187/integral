@@ -115,7 +115,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
     /**
      * 积分系统显示
-     *
+     * @param type  需要排序的 数据类型 meritScore 积分  ；默认 integral 积分
      * @param order
      * @return
      */
@@ -166,6 +166,10 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
 
         try {
+              if (null==extParams||"".equals( extParams )){
+                  logger.error( "<<<<<<<<<<扩展参数为null" );
+                   return false;
+              }
             JSONObject json = JSONObject.parseObject( extParams );
 //            //对 categoryId 进行判断 是否为空 如果为空将要被拦截
             JSONArray categoryId = (JSONArray) json.get( "category_id" );
