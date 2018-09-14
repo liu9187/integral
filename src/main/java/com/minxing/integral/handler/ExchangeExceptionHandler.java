@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 public class ExchangeExceptionHandler {
 
     Logger logger = LoggerFactory.getLogger(ExchangeExceptionHandler.class);
-    private static final Integer DATE_ERROR =20007;
-    private static final Integer POINTS_EXCHANGE_ERROR =20006;
-    private static final Integer INTEGRAL_ERROR =20005;
+    private static final Integer DATE_ERROR =20014;
+    private static final Integer POINTS_EXCHANGE_ERROR =20013;
+    private static final Integer INTEGRAL_ERROR =20012;
     private static final Integer PARAMETER_ERROR = 20004;
     private static final Integer UNKNOWN_ERROR = 22222;
     private static final Integer TOKEN_BAD = 20000;
@@ -37,12 +37,12 @@ public class ExchangeExceptionHandler {
             // 积分设置错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             // 返回错误的数据
-            return generateErrorMsg("设置失败请重试", INTEGRAL_ERROR);
+            return generateErrorMsg("设置失败，请重试", INTEGRAL_ERROR);
         }else if (e instanceof TokenBadException || e instanceof TokenDecryptException) {
             // 用户信息校验失败
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
             // 错误数据返回
-            return generateErrorMsg("permission validation failed", TOKEN_BAD);
+            return generateErrorMsg("获取权限失败", TOKEN_BAD);
         }else if (e instanceof PointsExchangeException){
             // 积分兑换错误,返回错误数据
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -56,7 +56,7 @@ public class ExchangeExceptionHandler {
         }
         logger.error("Unknown abnormal",e);
         response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        return generateErrorMsg("未知异常", UNKNOWN_ERROR);
+        return generateErrorMsg("服务器异常", UNKNOWN_ERROR);
     }
 
     /**
