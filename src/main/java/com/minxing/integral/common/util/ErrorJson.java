@@ -26,7 +26,6 @@ public class ErrorJson {
     public static class Errors {
         private String status_code;
         private String message;
-
         public String getStatus_code() {
             return status_code;
         }

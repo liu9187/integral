@@ -31,7 +31,7 @@ public class IntegralHelper {
         ringBuffer.addGatingSequences( processor.getSequence() );
         //把消息处理器提交到线程池
         executors.submit( processor );
-        //如果存大多个消费者 那重复执行上面3行代码 把TradeTransactionInDBHandler换成其它消费者类
+        //如果存大多个消费者 那重复执行上面3行代码 把IntegralHandler换成其它消费者类
         Future<?> future = executors.submit( (Callable<Void>) () -> {
             long seq;
             // for (int i=0;i<10;i++){

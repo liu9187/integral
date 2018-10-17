@@ -70,6 +70,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             Long integral = userInfos.getIntegral();
             //勋值
             Long meritScore = userInfos.getMeritScore();
+            logger.info( "-------before:integral="+integral+"; meritScore="+meritScore);
             try {
                 //积分数值大于或者等于 兑换值积分
                 if (integral >= userIntegral.getIntegral()) {
@@ -81,13 +82,21 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                     jsonObject.put( "message", "积分满足，兑换成功" );
                     //判断如果积分小于兑换值
                 } else {
-                    //如果勋值和积分的和大于或者兑换值
-                    if (integral + meritScore >= userIntegral.getIntegral()) {
+                       //计算积分和勋值之和
+                       Long value=integral+meritScore;
+                       logger.info( "----------integral+meritScore="+value );
+                    //如果勋值和积分的和大于或者等于兑换值
+                    if (value>= userIntegral.getIntegral()) {
                         UserInfos user = new UserInfos();
                         //兑换的积分
                         user.setIntegral( Long.valueOf( 0 ) );
+                        //剩余需要兑换的积分的值
+                          Long score= userIntegral.getIntegral()-integral;
+                          logger.info( "------剩余所需要扣除的勋值 score=="+score );
+                          //剩余勋值
+                        Long meritScore1 =meritScore - score;
                         //兑换的勋值
-                        user.setMeritScore( meritScore - userIntegral.getIntegral() - integral );
+                        user.setMeritScore( meritScore1);
                         user.setUserId( userIntegral.getUserId() );
                         //积分兑换
                         userIntegralMapper.removeUserIntegralByUserId( user );
