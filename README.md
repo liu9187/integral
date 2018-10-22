@@ -43,3 +43,10 @@ https://git.dehuinet.com/docs_group/api_docs
 
 
 ```
+## 1.0.2 2018 10月 22日 ##
+
+````
+*** 修改***
+1.积分勋值统计/兑换值 接口   querylist
+    返回值改变
+       Ⅰ. 增加  兑换值  value
