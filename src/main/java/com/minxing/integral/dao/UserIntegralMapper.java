@@ -361,7 +361,7 @@ public interface UserIntegralMapper {
         public String queryList(@Param("networkId") final String networkId, @Param("name") final String name, @Param("order") final Integer order, @Param("type") final String type) {
             StringBuffer sql = new StringBuffer();
             try {
-                sql.append( "SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,merit_score AS meritScore,dept.short_name AS shortName FROM users u  \n" + " LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" + " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" + " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} " );
+                sql.append( "SELECT u.id,u.`name`,IFNULL(ui.integral,0) AS integral,merit_score AS meritScore,dept.short_name AS shortName,IFNULL(ui.integral,0)+merit_score AS value FROM users u  \n" + " LEFT JOIN  user_infos ui ON ui.user_id=u.id   \n" + " LEFT JOIN  departments dept  ON dept.id=u.dept_id   \n" + " where u.role_code = 1 and u.actived = 1 and u.deleted_at > now() and u.network_id = #{networkId} " );
                 //判断是否有name
                 if (StringUtils.isNotEmpty( name )) {
                     sql.append( " AND (u.`name` LIKE #{name} OR u.pinyin LIKE #{name}  OR u.initialism LIKE #{name} ) " );

@@ -124,7 +124,7 @@ public class UserIntegralController {
     }
 
     /**
-     * 积分勋值统计
+     * 积分勋值统计/兑换管理
      *
      * @param pageNum  当前页
      * @param pageSize 当前页记录
@@ -145,6 +145,7 @@ public class UserIntegralController {
             logger.error( "error is controller querList networkId" );
             new ParameterErrorException();
         }
+        //分页插件
         PageHelper.startPage( pageNum, pageSize );
         List<IntegralManagementVO> vos = userIntegralService.queryList( networkId, nameStr, order ,type);
         PageInfo<IntegralManagementVO> pageInfo = new PageInfo<>( vos );

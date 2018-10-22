@@ -21,6 +21,18 @@ public class IntegralManagementVO {
      * 勋值
      */
     private Long meritScore;
+    /**
+     * 兑换值
+     */
+    private Long value;
+
+    public Long getValue() {
+        return value;
+    }
+
+    public void setValue(Long value) {
+        this.value = value;
+    }
 
     public Integer getId() {
         return id;
