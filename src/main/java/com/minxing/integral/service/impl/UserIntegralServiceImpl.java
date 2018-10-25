@@ -70,7 +70,7 @@ public class UserIntegralServiceImpl implements UserIntegralService {
             Long integral = userInfos.getIntegral();
             //勋值
             Long meritScore = userInfos.getMeritScore();
-            logger.info( "-------before:integral="+integral+"; meritScore="+meritScore);
+            logger.info( "-------before:integral=" + integral + "; meritScore=" + meritScore );
             try {
                 //积分数值大于或者等于 兑换值积分
                 if (integral >= userIntegral.getIntegral()) {
@@ -82,21 +82,21 @@ public class UserIntegralServiceImpl implements UserIntegralService {
                     jsonObject.put( "message", "积分满足，兑换成功" );
                     //判断如果积分小于兑换值
                 } else {
-                       //计算积分和勋值之和
-                       Long value=integral+meritScore;
-                       logger.info( "----------integral+meritScore="+value );
+                    //计算积分和勋值之和
+                    Long value = integral + meritScore;
+                    logger.info( "----------integral+meritScore=" + value );
                     //如果勋值和积分的和大于或者等于兑换值
-                    if (value>= userIntegral.getIntegral()) {
+                    if (value >= userIntegral.getIntegral()) {
                         UserInfos user = new UserInfos();
                         //兑换的积分
                         user.setIntegral( Long.valueOf( 0 ) );
                         //剩余需要兑换的积分的值
-                          Long score= userIntegral.getIntegral()-integral;
-                          logger.info( "------剩余所需要扣除的勋值 score=="+score );
-                          //剩余勋值
-                        Long meritScore1 =meritScore - score;
+                        Long score = userIntegral.getIntegral() - integral;
+                        logger.info( "------剩余所需要扣除的勋值 score==" + score );
+                        //剩余勋值
+                        Long meritScore1 = meritScore - score;
                         //兑换的勋值
-                        user.setMeritScore( meritScore1);
+                        user.setMeritScore( meritScore1 );
                         user.setUserId( userIntegral.getUserId() );
                         //积分兑换
                         userIntegralMapper.removeUserIntegralByUserId( user );
@@ -116,14 +116,18 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
         }
         UserInfos result = userIntegralMapper.selectMeritByUserId( userIntegral.getUserId() );
+              // 返回 积分  和 勋值的 总值
+        Long  value=result.getIntegral()+result.getMeritScore();
         jsonObject.put( "integral", result.getIntegral() );
         jsonObject.put( "meritScore", result.getMeritScore() );
+        jsonObject.put("value",value);
 
         return jsonObject.toJSONString();
     }
 
     /**
      * 积分系统显示
+     *
      * @param type  需要排序的 数据类型 meritScore 积分  ；默认 integral 积分
      * @param order
      * @return
@@ -175,10 +179,10 @@ public class UserIntegralServiceImpl implements UserIntegralService {
     public Boolean addIntegralByUserId(String userId, String actionType, String extParams) {
 
         try {
-              if (null==extParams||"".equals( extParams )){
-                  logger.error( "<<<<<<<<<<扩展参数为null" );
-                   return false;
-              }
+            if (null == extParams || "".equals( extParams )) {
+                logger.error( "<<<<<<<<<<扩展参数为null" );
+                return false;
+            }
             JSONObject json = JSONObject.parseObject( extParams );
 //            //对 categoryId 进行判断 是否为空 如果为空将要被拦截
             JSONArray categoryId = (JSONArray) json.get( "category_id" );
@@ -245,9 +249,9 @@ public class UserIntegralServiceImpl implements UserIntegralService {
 
                     Long integral_sum = integral.getIntegral().intValue() + userIntegral;
                     //增加之后用户积分
-                    logger.info( "增加之后的用户积分 integral_sum -----------" + integral_sum);
+                    logger.info( "增加之后的用户积分 integral_sum -----------" + integral_sum );
                     data_type = "integral";
-                    integer = String.valueOf( integral_sum);
+                    integer = String.valueOf( integral_sum );
                 }
 
 
