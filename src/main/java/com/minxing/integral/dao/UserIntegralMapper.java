@@ -384,6 +384,15 @@ public interface UserIntegralMapper {
                         sql.append( "  ORDER BY ui.merit_score DESC  ,u.pinyin ASC" );
                     }
                 }
+                //兑换值排序
+                if (type.equals( "value" )) {
+                    //判断是升序还是降序
+                    if (order == 1) {
+                        sql.append( "ORDER BY IFNULL(ui.integral, 0) + ui.merit_score   ,u.pinyin ASC" );
+                    } else if (order == 0) {
+                        sql.append( "ORDER BY IFNULL(ui.integral, 0) + ui.merit_score DESC  ,u.pinyin ASC" );
+                    }
+                }
 
             } catch (Exception e) {
                 //积分管理升序用户sql出现错误日志
